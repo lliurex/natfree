@@ -3,6 +3,8 @@
 ###############
 # global vars #
 ###############
+# load common functions
+. /usr/share/natfree-common/natfree-common
 
 # hosts file to write 
 HOSTS_FILE="/etc/hosts.d/arithmetic-server.hosts"
@@ -14,9 +16,6 @@ SRV_ALIASES="server,srv,servidor,fs,mirror,lliurex-mirror,cups,www,ntp,share,jcl
 
 # get default route iface
 GW_IFACE="$(get_gw_iface)"
-
-# load common functions
-. /usr/share/natfree-common/natfree-common
 
 usage(){
         die "Usage" "$(basename "$0") [options]" \
@@ -53,7 +52,7 @@ main(){
 		# validate
                 echo "$SRV_IP_NUMBER" |grep -q "^[[:digit:]]\+$" || die "Invalid IP number/position $SRV_IP_NUMBER"
                 [ "$GW_IFACE" ] || die "Undefined physical interface"
-                get_interface_list | grep -qFX "$GW_IFACE" || die "Invalid physical interface $GW_IFACE"
+                get_interface_list | grep -qFx "$GW_IFACE" || die "Invalid physical interface $GW_IFACE"
 
                 shift
         done

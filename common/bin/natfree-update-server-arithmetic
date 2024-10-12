@@ -3,12 +3,11 @@
 ###############
 # global vars #
 ###############
+# load common functions
+. /usr/share/natfree-common/natfree-common
 
 # get default route iface
 GW_IFACE="$(get_gw_iface)"
-
-# load common functions
-. /usr/share/natfree-common/natfree-common
 
 # name of virtual iface to assign when
 # GW_IFACE brings up
@@ -58,7 +57,7 @@ main(){
 		[ "$SRV_VIRTUAL_IFACE" ] || die "Undefined virtual interface"
 
 		[ "$GW_IFACE" ] || die "Undefined physical interface"
-		get_interface_list | grep -qFX "$GW_IFACE" || die "Invalid physical interface $GW_IFACE"
+		get_interface_list | grep -qFx "$GW_IFACE" || die "Invalid physical interface $GW_IFACE"
 		shift
 	done
 
@@ -72,10 +71,10 @@ main(){
 	SRV_CIDR="$(get_srv_cidr "$CIDR" "$SRV_IP_NUMBER")"
 
 	# check existence of SRV_VIRTUAL_IFACE and create if needed
-	if ! get_interface_list | grep -qFX "$SRV_VIRTUAL_IFACE" ; then
-		create_virt_iface "$SRV_VIRTUAL_IFACE"
+	if ! get_interface_list | grep -qFx "$SRV_VIRTUAL_IFACE" ; then
+		create_virt_iface "$SRV_VIRTUAL_IFACE" "$GW_IFACE"
 		# test creation
-		get_interface_list | grep -qFX "$SRV_VIRTUAL_IFACE" || die "Unable to create virtual interface $SRV_VIRTUAL_IFACE"
+		get_interface_list | grep -qFx "$SRV_VIRTUAL_IFACE" || die "Unable to create virtual interface $SRV_VIRTUAL_IFACE"
 	fi
 
 	# assign SRV_IP to virtual interface
@@ -90,12 +89,19 @@ main(){
 	# update server n4d variables
 	# TODO: please avoid this dirty trick ...
 	# BEGIN 
-	#N4DVARS_DIR="/var/lib/n4d/variables"
+	N4DVARS_DIR="/var/lib/n4d/variables"
 	N4DVARS_FILES="SRV_IP,$SRV_IP CLIENT_LDAP_URI,ldaps://$SRV_IP CLIENT_LDAP_URI_NOSSL,ldap://$SRV_IP"
-	for f in "$N4DVARS_FILES" ; do
+	N4DVARS_BACKUP_DIR="/tmp/n4dvars-backup/$(date "+%s")"
+	mkdir -p "$N4DVARS_BACKUP_DIR"
+	for f in $N4DVARS_FILES ; do
 		VAR_FILE="${N4DVARS_DIR}/${f%,*}"
 		VAR_VALUE="${f#*,}"
-		sed -i -n "/\"value\":/s%:.*$%: \"$VAR_VALUE\",%" "$VAR_FILE"
+		if [ -e "$VAR_FILE" ] ; then
+			# make a copy
+			BASENAME_FILE="$(basename "$VAR_FILE")"
+			cp "$VAR_FILE" "$N4DVARS_BACKUP_DIR/${BASENAME_FILE}"
+			sed -i -e "/\"value\":/s%:.*$%: \"$VAR_VALUE\",%" "$VAR_FILE"
+		fi
 	done
 	service n4d restart
 	# END

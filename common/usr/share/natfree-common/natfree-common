@@ -2,8 +2,8 @@
 # global vars #
 ###############
 
-# Asume server uses 5th available IP in subnet
-SRV_IP_NUMBER=5
+# Asume server uses 4th available IP in subnet
+SRV_IP_NUMBER=4
 
 
 
@@ -28,12 +28,12 @@ die(){
 }
 
 get_interface_list(){
-	LANG=C ip a |sed -ne "/^[[:digit:]]\+:/{s%^[[:digit:]]\+:[[:blank:]]\+%%;s%:.*$%%;p}"
+	LANG=C ip a |sed -ne "/^[[:digit:]]\+:/{s%^[[:digit:]]\+:[[:blank:]]\+%%;s%:.*$%%;s%@.*$%%;p}"
 }
 
 get_gw_iface(){
-	# prints default route iface name
-	LANG=C ip -4 route list 0/0 | cut -d ' ' -f 5
+	# prints first default route iface name
+	LANG=C ip -4 route list 0/0 |head -1 |cut -d ' ' -f 5
 }
 
 create_virt_iface(){

@@ -1,3 +1,54 @@
+natfree (0.8) unstable; urgency=medium
+
+  * Back to 4th IP number for testing
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Sat, 12 Oct 2024 23:18:18 +0200
+
+natfree (0.7) unstable; urgency=medium
+
+  * Improved backup strategy
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Sat, 12 Oct 2024 23:10:52 +0200
+
+natfree (0.6) unstable; urgency=medium
+
+  * Added n4d variables backup
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Sat, 12 Oct 2024 22:57:13 +0200
+
+natfree (0.5) unstable; urgency=medium
+
+  * Fixed the obscene trick to update n4d variables...
+    Please remove this infamous code !!
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Sat, 12 Oct 2024 22:32:44 +0200
+
+natfree (0.41) unstable; urgency=medium
+
+  * dummy upgrade
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Sat, 12 Oct 2024 22:13:47 +0200
+
+natfree (0.4) unstable; urgency=medium
+
+  * Improved get_gw_iface in case of multiple default gateways
+  * Fixed missing parameter when calling create_virt_iface from update-server
+  * Show correct virtual interface names in get_interface_list
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Sat, 12 Oct 2024 21:27:08 +0200
+
+natfree (0.3) unstable; urgency=medium
+
+  * Minor fixes
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Sat, 12 Oct 2024 20:59:35 +0200
+
+natfree (0.2) unstable; urgency=medium
+
+  * Fixed missing links in /usr/lib/networkd-dispatcher/routable.d
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Sat, 12 Oct 2024 20:44:20 +0200
+
 natfree (0.1) unstable; urgency=low
 
   * Initial release.

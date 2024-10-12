@@ -1,2 +1,4 @@
-/usr/bin/natfree-update-client-arithmetic	/usr/bin/natfree-update-client
-/usr/share/natfree-client-arithmetic		/etc/network/if-up.d/natfree-client
+/usr/bin/natfree-update-client-arithmetic		/usr/bin/natfree-update-client
+/usr/share/natfree-client/natfree-client-arithmetic	/etc/network/if-up.d/natfree-client
+/usr/share/natfree-client/natfree-client-arithmetic	/usr/lib/networkd-dispatcher/routable.d/natfree-client
+
