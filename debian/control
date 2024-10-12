@@ -1,0 +1,40 @@
+Source: natfree
+Section: misc
+Priority: optional
+Maintainer: Luis Garcia Gisbert <luisgg@gmail.com>
+Standards-Version: 4.3.0
+Build-Depends: debhelper-compat (= 10)
+Homepage: https://gitlab.com/luisgg/update-hosts
+
+Package: natfree-common
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, update-hosts
+Description: natfree - client and server common files
+ The natfree package is a suite of tools to auto discover services
+ in hostile network environments managed by third parties.
+ .
+ The included tools can be used to configure servers and
+ workstations without the need for specific DNS or DHCP settings.
+
+Package: natfree-client-arithmetic
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version})
+Provides: natfree-client
+Description: natfree - arithmetic client settings
+ The natfree package is a suite of tools to auto discover services
+ in hostile network environments managed by third parties.
+ .
+ The included tools can be used to configure servers and
+ workstations without the need for specific DNS or DHCP settings.
+
+Package: natfree-server-arithmetic
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version})
+Provides: natfree-server
+Description: natfree - arithmetic server settings
+ The natfree package is a suite of tools to auto discover services
+ in hostile network environments managed by third parties.
+ .
+ The included tools can be used to configure servers and
+ workstations without the need for specific DNS or DHCP settings.
+

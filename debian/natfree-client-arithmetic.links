@@ -1,0 +1,2 @@
+/usr/bin/natfree-update-client-arithmetic	/usr/bin/natfree-update-client
+/usr/share/natfree-client-arithmetic		/etc/network/if-up.d/natfree-client
