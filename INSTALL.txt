@@ -1,8 +1,11 @@
 No extra dependencies required. 
 The included scripts use /bin/sh , ip, sed, grep, cut, bc and some sh builtins
 
-1. copy (or link) file ./bin/update-hosts to a directory included in $PATH
+1. To install update-hosts, see repository:
+   https://gitlab.com/luisgg/update-hosts
+
 2. copy  (or link) directory ./common/usr/share/update-hosts to /usr/share
+
 3. For arithmetic client
 	copy  ./client/arithmetic-client to /etc/network/if-up.d
    	arithmetic-client file permissions must be 0755 and must be owned by root user and group (uid=0, gid=0)
