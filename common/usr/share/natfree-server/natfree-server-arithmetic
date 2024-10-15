@@ -4,11 +4,11 @@
 #  vars & functions #
 #####################
 
-# get default route iface
-GW_IFACE="$(get_gw_iface)"
-
 # load common functions
 . /usr/share/natfree-common/natfree-common
+
+# get default route iface
+GW_IFACE="$(get_gw_iface)"
 
 ########
 # main #

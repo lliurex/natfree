@@ -1,3 +1,9 @@
+natfree (0.9) unstable; urgency=medium
+
+  * Fixed networkd-dispatcher scripts. 
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Tue, 15 Oct 2024 08:07:08 +0200
+
 natfree (0.8) unstable; urgency=medium
 
   * Back to 4th IP number for testing
