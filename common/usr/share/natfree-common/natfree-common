@@ -3,7 +3,9 @@
 ###############
 
 # Asume server uses 4th available IP in subnet
+# # and default interface name
 SRV_IP_NUMBER=4
+SRV_VIRTUAL_IFACE="natfree00"
 
 
 
@@ -27,13 +29,30 @@ die(){
         exit 1
 }
 
+
 get_interface_list(){
 	LANG=C ip a |sed -ne "/^[[:digit:]]\+:/{s%^[[:digit:]]\+:[[:blank:]]\+%%;s%:.*$%%;s%@.*$%%;p}"
+}
+
+test_iface(){
+	get_interface_list | grep -qFx "$1" || return 1
+	return 0
 }
 
 get_gw_iface(){
 	# prints first default route iface name
 	LANG=C ip -4 route list 0/0 |head -1 |cut -d ' ' -f 5
+}
+
+get_virt_iface(){
+	VIFACE="$SRV_VIRTUAL_IFACE"
+	[ -n "$1" ] || VIFACE="$1"
+	echo "$VIFACE"
+}
+	
+test_virt_iface(){
+	test_iface "$(get_virt_iface "$1")" || return 1
+	return 0
 }
 
 create_virt_iface(){

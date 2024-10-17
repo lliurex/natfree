@@ -1,0 +1,42 @@
+#!/bin/sh
+
+#  Description:
+#
+# This is an if-up.d script to create natfree nework interface when bringing up network
+# The script by itself, creates interface (if needed) without configuration.
+# This script also checks for the availability of "natfree-update-server" configuration tool.
+# If this configuration tool is available (like in a wired natfree lliurex server)
+# natfree-update-server is invoked to configure the interface.
+#
+
+
+#####################
+#  vars & functions #
+#####################
+
+# load common functions
+. /usr/share/natfree-common/natfree-common
+
+# get default route iface
+GW_IFACE="$(get_gw_iface)"
+
+########
+# main #
+########
+
+[ "$GW_IFACE" ] || die "Unable to find network gateway iface"
+[ "$IFACE" ] || die "Undefined 'IFACE' environment var. May be not running under networkd-dispatcher?"
+
+# correct interface up?
+[ "$GW_IFACE" = "$IFACE" ] || exit 0
+
+if type natfree-update-server >/dev/null 2>/devnull ; then
+#	 do full automatic settings if natfree-update is installed
+	natfree-update-server -a
+else
+#	 just create interface
+	natfree-iface create -i "$GW_IFACE"
+fi
+
+exit 0
+
