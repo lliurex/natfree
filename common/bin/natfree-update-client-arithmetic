@@ -1,59 +1,140 @@
 #!/bin/sh
 
+#  Description:
+#
+# natfree client tool to configure /etc/hosts with server configuration
+# The default values of the parameters are obtained sourcing the files
+# (with extension .cfg) from the /etc/natfree-d directory
+#
+
+
 ###############
 # global vars #
 ###############
+# hosts file to write 
+HOSTS_FILE="/etc/hosts.d/arithmetic-server.hosts"
+DEBUG=""
+ACTION=""
+
+# Testing .... HOSTS_FILE="/tmp/arithmetic-server.hosts"
+
 # load common functions
 . /usr/share/natfree-common/natfree-common
 
-# hosts file to write 
-HOSTS_FILE="/etc/hosts.d/arithmetic-server.hosts"
-# Testing .... HOSTS_FILE="/tmp/arithmetic-server.hosts"
-
+CLIENT_IFACE="$(get_client_iface)"
+IP_NUMBER="$(get_ip_number)"
 # List of servers aliases to write (comma separated)
 # TODO: revise list ...
-SRV_ALIASES="server,srv,servidor,fs,mirror,lliurex-mirror,cups,www,ntp,share,jclic-aula,lliurexlab,error,ipxboot,admin-center"
-
-# get default route iface
-GW_IFACE="$(get_gw_iface)"
+SRV_ALIASES="$(get_srv_aliases)"
 
 usage(){
-        die "Usage" "$(basename "$0") [options]" \
-            "       options:" \
-            "           -a            : automagic detection/default parameters" \
-            "           -n NUMBER     : IP number/position in subnet" \
-            "           -i PHYS_IFACE : physical interface name (defaults to $GW_IFACE)"
+        die "Usage" "$(basename "$0") [ OPTIONS ] COMMAND"  \
+            "       OPTIONS:" \
+            "           -i PHYS_IFACE : physical interface name (defaults to $CLIENT_IFACE)" \
+	    "           -n NUMBER     : IP number/position in subnet (defults to $IP_NUMBER)" \
+	    "           -a ALIASES_LIST: comma separated list of names (defaults to $SRV_ALIASES)" \
+            "           -d            : debug mode (verbose)" \
+            "       COMMAND:" \
+            "           UPDATE        : update /etc/hosts file" \
+            "           DESTROY|DELETE: remove data from /etc/hosts file" \
+            "Command names can be used in lower or upper case and abbreviated down to a single letter." \
+            "Where there is ambiguity, dictionary order is used to select a command."
 }
 
 #############
 # functions #
 #############
 main(){
-	# check parameters
-        [ "$1" ] || usage
+        # check parameters
 
-        while [ "$1" ] ; do
+        [ "$1" ] || usage
+        OPTIONS=""
+        while echo "$1" | grep -q "^-" ; do
                 case "$1" in
-                        -n)
-                                shift
-                                SRV_IP_NUMBER="$1"
-                                ;;
                         -i)
+                                [ "$#" -ge 3 ] || usage
                                 shift
-                                GW_IFACE="$1"
+                                CLIENT_IFACE="$(get_client_iface "$1")"
                                 ;;
-                        -a)
-                                # use default
+			-a)
+                                [ "$#" -ge 3 ] || usage
+                                shift
+				SRV_ALIASES="$(get_srv_aliases "$1")"
+				;;
+			-n)
+                                [ "$#" -ge 3 ] || usage
+                                shift
+				IP_NUMBER="$(get_ip_number "$1")"
+				;;
+
+                        -d)
+                                DEBUG="Y"
                                 ;;
                         *)
                                 usage
                                 ;;
                 esac
-		# validate
-                echo "$SRV_IP_NUMBER" |grep -q "^[[:digit:]]\+$" || die "Invalid IP number/position $SRV_IP_NUMBER"
-                [ "$GW_IFACE" ] || die "Undefined physical interface"
-                get_interface_list | grep -qFx "$GW_IFACE" || die "Invalid physical interface $GW_IFACE"
+                OPTIONS="$OPTIONS $1"
+                shift
+        done
 
+        [ "$1" ] || usage
+
+        if [ "$DEBUG" ] ; then
+                cat << EOF
+- Options selected  : [$OPTIONS ]
+- Physical interface: [ $CLIENT_IFACE ]
+- IP number         : [ $IP_NUMBER ]
+- Server aliases    : [ $SRV_ALIASES ]
+EOF
+        fi
+
+        A="$(echo "$1" |tr "[:lower:]" "[:upper:]")"
+
+        case "$A" in
+                D*)
+			ACTION="DESTROY DELETE"
+			OK=""
+			for a in $ACTION ; do
+				if echo "$a" |grep -q "^$A" ; then
+				       OK="Y"
+				fi
+			done
+			[ "$OK" ] || usage
+                        [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			;;
+i# recopile necessary data
+
+        # get DNS search domain from resolv.conf (if any)
+        SEARCH_DOMAIN="$(get_domain)"
+        [ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
+
+        # get ip/mask in CIDR notation
+        CIDR="$(get_iface_cidr "$GW_IFACE")"
+        [ "$CIDR" ] || die "Unable to retrieve IP address from $GW_IFACE"
+
+        # get SRV_IP_NUMBER available ip in subnet
+        SRV_IP="$(get_srv_ip "$CIDR" "$SRV_IP_NUMBER")"
+
+        # generate .hosts file
+        echo "# BEGIN arithmetic-server IPs" > "$HOSTS_FILE"
+        generate_hosts "${SRV_IP}:${SRV_ALIASES}${SEARCH_DOMAIN}" >> "$HOSTS_FILE"
+        echo "# END arithmetic-server IPs" >> "$HOSTS_FILE"
+
+        # update /etc/hosts
+        update-hosts
+
+                U*)
+			ACTION="UPDATE"
+                        echo "$ACTION" |grep -q "^$A" || usage
+                        [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			;;
+		*)
+			usage
+			;;
+                esac
+
+		# validate
                 shift
         done
 
@@ -78,6 +159,8 @@ main(){
 
 	# update /etc/hosts
 	update-hosts
+
+
 }
 
 ################

@@ -2,24 +2,26 @@
 
 #  Description:
 #
-# swiss army tool to configure natfree virtual interface
-# natfree interface is This is an if-up.d script to create natfree nework interface when bringing up network
-# The script by itself, creates interface (if needed) without configuration.
-# This script also checks for the availability of "natfree-update-server" configuration tool.
-# If this configuration tool is available (like in a wired natfree lliurex server)
-# natfree-update-server is invoked to configure the interface.
+# Swiss army tool to manage natfree virtual interface.
+# The script mimics in a simplified way the syntax of the ip command,
+# and provides default values for most parameters sourcing files with .cfg extension
+# Run the script with option -h or no parameters to get help.
 #
 
 ###############
 # global vars #
 ###############
-SRV_VIRTUAL_IFACE=""
+SRV_VIRT_IFACE=""
+SRV_PHYS_IFACE=""
 CIDR=""
-METRIC=""
 ACTION=""
+DEBUG=""
 
 # load common functions
 . /usr/share/natfree-common/natfree-common
+SRV_PHYS_IFACE="$(get_phys_iface)"
+SRV_VIRT_IFACE="$(get_virt_iface)"
+
 
 #############
 # functions #
@@ -28,168 +30,128 @@ ACTION=""
 usage(){
         die "Usage" "$(basename "$0") [ OPTIONS ] COMMAND"  \
             "       OPTIONS:" \
-            "           -v VIRT_IFACE : virtual interface name (defaults to $SRV_VIRTUAL_IFACE)" \
+            "           -i PHYS_IFACE : physical interface name (defaults to $SRV_PHYS_IFACE)" \
+            "           -v VIRT_IFACE : virtual interface name (defaults to $SRV_VIRT_IFACE)" \
+	    "           -d            : debug mode (verbose)" \
 	    "       COMMAND:" \
-	    "           CREATE           : create interface" \
-	    "           DELETE           : delete interface" \
-	    "           SHOW             : show interface configuration" \
-	    "           ADDRESS [IP/MASK]: show/set interface network address" \
-	    "           UP               : bring interface up" \
-	    "           DOWN             : bring interface down" \
-	    "           METRIC [NUMBER]  : show/set interface metric value" \
+	    "           CREATE              : create interface" \
+	    "           DELETE              : delete interface" \
+	    "           SHOW                : show interface configuration" \
+	    "           ADDRESS [CIDR|+NUM] : show/set interface network address" \
+	    "           UP                  : bring interface up" \
+	    "           DOWN                : bring interface down" \
             "Command names can be used in lower or upper case and abbreviated down to a single letter." \
-	    " Where there is ambiguity, dictionary order is used to select a command."
+	    "Where there is ambiguity, dictionary order is used to select a command."
 }
 
 main(){
 
-	# check parameters/commands
-	# TODO: get an ordered way to get this ...
+	# check parameters
 
 	[ "$1" ] || usage
-	if [ "$1" = "-v" ] ; then
-		[ "$#" -ge 3 ] || usage
+	OPTIONS=""
+	while echo "$1" | grep -q "^-" ; do
+		case "$1" in
+			-v)
+				[ "$#" -ge 3 ] || usage
+				shift
+				SRV_VIRT_IFACE="$(get_virt_iface "$1")"
+				;;
+			-i)
+				[ "$#" -ge 3 ] || usage
+				shift
+				SRV_PHYS_IFACE="$(get_phys_iface "$1")"
+				;;
+			-d)
+				DEBUG="Y"
+				;;
+			*)
+				usage
+				;;
+		esac
+		OPTIONS="$OPTIONS $1"
 		shift
-		SRV_VIRTUAL_IFACE="$1"
-		shift
+	done
+
+	# check commands
+	[ "$1" ] || usage
+	if [ "$DEBUG" ] ; then
+		cat << EOF
+- Options selected  : [$OPTIONS ]
+- Virtual interface : [ $SRV_VIRT_IFACE ]
+- Physical interface: [ $SRV_PHYS_IFACE ]
+EOF
 	fi
-	SRV_VIRTUAL_IFACE="$(get_virt_iface "$SRV_VIRTUAL_IFACE")"
+
 	A="$(echo "$1" |tr "[:lower:]" "[:upper:]")"
 
 	case "$A" in
 		A*)
 			ACTION="ADDRESS"
+			echo "$ACTION" |grep -q "^$A" || usage
+			[ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+
 			if [ "$#" -ge 2 ] ; then
 				shift
 				CIDR="$1"
-			fi
-			test_iface "$SRV_VIRTUAL_IFACE" || die "Virtual interface not created"
-			if [ "$CIDR" ] ; then
-				addr_virt_iface "$SRV_VIRTUAL_IFACE" "$CIDR"
+				if echo "$1" |grep -q "^[[:digit:]]\+$" ; then
+					IP_NUM="$1"
+					PCIDR="$(get_iface_cidr "$SRV_PHYS_IFACE")"
+					CIDR="$(get_srv_cidr "$PCIDR" "$IP_NUM")"
+					[ -z "$DEBUG" ] || echo "  -- IP number: [ $IP_NUM of $PCIDR ]"
+				fi
+
+				if echo "$CIDR" |grep -q "^\([[:digit:]]\+\.\)\{3\}[[:digit:]]\+/[[:digit:]]\+$" ; then
+					[ -z "$DEBUG" ] || echo "  --  cidr: [ $CIDR ]"
+					addr_virt_iface "$SRV_VIRT_IFACE" "$CIDR"
+				else
+					die "Invalid parameter: $CIDR"
+				fi
 			else
-				show_addr_virt_iface "$SRV_VIRTUAL_IFACE"
+				show_addr_virt_iface "$SRV_VIRT_IFACE"
 			fi
 			;;
 		C*)
 			ACTION="CREATE"
-			if test_iface "$SRV_VIRTUAL_IFACE" ; then
-				die "Virtual interface already created"
-			else
-				create_virt_iface "$SRV_VIRTUAL_IFACE"
-			fi
+			echo "$ACTION" |grep -q "^$A" || usage
+			[ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			create_virt_iface "$SRV_VIRT_IFACE" "$SRV_PHYS_IFACE"
 			;;
 		D|DE*)
 			ACTION="DELETE"
-			if test_iface "$SRV_VIRTUAL_IFACE" ; then
-				die "Virtual interface already created"
+			echo "$ACTION" |grep -q "^$A" || usage
+			[ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			if test_iface "$SRV_VIRT_IFACE" ; then
+				delete_virt_iface "$SRV_VIRT_IFACE"
 			else
-				create_virt_iface "$SRV_VIRTUAL_IFACE"
+				die "Virtual interface not created"
 			fi
 			;;
 		DO*)
 			ACTION="DOWN"
-			;;
-		M*)
-			ACTION="METRIC"
-			if [ "$#" -ge 2 ] ; then
-				shift
-				METRIC="$1"
-			fi
+			echo "$ACTION" |grep -q "^$A" || usage
+			[ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			test_iface "$SRV_VIRT_IFACE" || die "Virtual interface not created"
+			down_virt_iface "$SRV_VIRT_IFACE"
 			;;
 		S*)
 			ACTION="SHOW"
+			echo "$ACTION" |grep -q "^$A" || usage
+			[ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			show_virt_iface "$SRV_VIRT_IFACE"
 			;;
 		U*)
-			ACTION="UPPER"
+			ACTION="UP"
+			echo "$ACTION" |grep -q "^$A" || usage
+			[ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			test_iface "$SRV_VIRT_IFACE" || die "Virtual interface not created"
+			up_virt_iface "$SRV_VIRT_IFACE"
 			;;
 		*)
 			usage
 			;;
 	esac
 
-	# do the real job ...
-	case "$ACTION" in
-		ADDRESS)
-			test_iface "$SRV_VIRTUAL_IFACE" || die "Virtual interface not created"
-			if [ "$CIDR" ] ; then
-				addr_virt_iface "$SRV_VIRTUAL_IFACE" "$CIDR"
-			else
-				show_addr_virt_iface "$SRV_VIRTUAL_IFACE"
-			fi
-			;;
-		C*)
-			ACTION="CREATE"
-			;;
-		D|DE*)
-			ACTION="DELETE"
-			;;
-		DO*)
-			ACTION="DOWN"
-			;;
-		M*)
-			ACTION="METRIC"
-			if [ "$#" -ge 2 ] ; then
-				shift
-				METRIC="$1"
-			fi
-			;;
-		S*)
-			ACTION="SHOW"
-			;;
-		U*)
-			ACTION="UPPER"
-			;;
-		*)
-			usage
-			;;
-	esac
-
-
-
-	# recopile necessary data
-
-	# get ip/mask in CIDR notation
-	CIDR="$(get_iface_cidr "$GW_IFACE")"
-	[ "$CIDR" ] || die "Unable to retrieve IP address from $GW_IFACE"
-
-	# get SRV_IP_NUMBER available ip in subnet
-	SRV_CIDR="$(get_srv_cidr "$CIDR" "$SRV_IP_NUMBER")"
-
-	# check existence of SRV_VIRTUAL_IFACE and create if needed
-	if ! get_interface_list | grep -qFx "$SRV_VIRTUAL_IFACE" ; then
-		create_virt_iface "$SRV_VIRTUAL_IFACE" "$GW_IFACE"
-		# test creation
-		get_interface_list | grep -qFx "$SRV_VIRTUAL_IFACE" || die "Unable to create virtual interface $SRV_VIRTUAL_IFACE"
-	fi
-
-	# assign SRV_IP to virtual interface
-	# TODO: test this code !!!!!!!
-	ip link set dev "$SRV_VIRTUAL_IFACE" down
-	ip addr add "$SRV_CIDR" dev "$SRV_VIRTUAL_IFACE"
-	ip link set dev "$SRV_VIRTUAL_IFACE" up
-
-	# extract SRV_IP
-	SRV_IP="${SRV_CIDR%/*}"
-
-	# update server n4d variables
-	# TODO: please avoid this dirty trick ...
-	# BEGIN 
-	N4DVARS_DIR="/var/lib/n4d/variables"
-	N4DVARS_FILES="SRV_IP,$SRV_IP CLIENT_LDAP_URI,ldaps://$SRV_IP CLIENT_LDAP_URI_NOSSL,ldap://$SRV_IP"
-	N4DVARS_BACKUP_DIR="/tmp/n4dvars-backup/$(date "+%s")"
-	mkdir -p "$N4DVARS_BACKUP_DIR"
-	for f in $N4DVARS_FILES ; do
-		VAR_FILE="${N4DVARS_DIR}/${f%,*}"
-		VAR_VALUE="${f#*,}"
-		if [ -e "$VAR_FILE" ] ; then
-			# make a copy
-			BASENAME_FILE="$(basename "$VAR_FILE")"
-			cp "$VAR_FILE" "$N4DVARS_BACKUP_DIR/${BASENAME_FILE}"
-			sed -i -e "/\"value\":/s%:.*$%: \"$VAR_VALUE\",%" "$VAR_FILE"
-		fi
-	done
-	service n4d restart
-	# END
 
 }
 

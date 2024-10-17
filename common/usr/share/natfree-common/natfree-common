@@ -4,10 +4,8 @@
 
 # Asume server uses 4th available IP in subnet
 # # and default interface name
-SRV_IP_NUMBER=4
-SRV_VIRTUAL_IFACE="natfree00"
 
-
+CFG_DIR="/etc/natfree.d"
 
 #############
 # functions #
@@ -29,6 +27,14 @@ die(){
         exit 1
 }
 
+get_gw_iface(){
+	# prints first default route iface name
+	LANG=C ip -4 route list 0/0 |head -1 |cut -d ' ' -f 5
+}
+
+
+# load config
+for f in $(ls -1 "$CFG_DIR" |grep "\.cfg$" |sort) ; do . $CFG_DIR/$f ; done
 
 get_interface_list(){
 	LANG=C ip a |sed -ne "/^[[:digit:]]\+:/{s%^[[:digit:]]\+:[[:blank:]]\+%%;s%:.*$%%;s%@.*$%%;p}"
@@ -39,30 +45,94 @@ test_iface(){
 	return 0
 }
 
-get_gw_iface(){
-	# prints first default route iface name
-	LANG=C ip -4 route list 0/0 |head -1 |cut -d ' ' -f 5
+get_var_value(){
+	NEW_VAL="$1"
+	DEF_VAL="$2"
+	[ "$1" ] || NEW_VAL="$DEF_VAL"
+	[ "$2" ] || die "Invalid default value"
+	echo "$NEW_VAL"
+}
+
+get_client_iface(){
+	get_var_value "$1" "$NF_DEF_CLIENT_IFACE"
+}
+
+get_srv_aliases(){
+	get_var_value "$1" "$NF_DEF_SRV_ALIASES"
 }
 
 get_virt_iface(){
-	VIFACE="$SRV_VIRTUAL_IFACE"
-	[ -n "$1" ] || VIFACE="$1"
-	echo "$VIFACE"
+	get_var_value "$1" "$NF_DEF_VIRT_IFACE"
 }
 	
+get_phys_iface(){
+	get_var_value "$1" "$NF_DEF_PHYS_IFACE"
+}
+
+get_ip_number(){
+	IP0="$(echo "$1" |sed -e "s%^+%%")"
+	get_var_value "$IP0" "$NF_DEF_IP_NUMBER"
+}
+
 test_virt_iface(){
 	test_iface "$(get_virt_iface "$1")" || return 1
 	return 0
+}
+
+down_virt_iface(){
+	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
+        test_iface "$VIRTUAL_IFACE" || die "Virtual interface not created"
+	ip link set "$VIRTUAL_IFACE" down
+}
+
+up_virt_iface(){
+	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
+        test_iface "$VIRTUAL_IFACE" || die "Virtual interface not created"
+	ip link set "$VIRTUAL_IFACE" up
+}
+
+addr_virt_iface(){
+	SRV_VIRT_IFACE="$(get_virt_iface "$1")"
+	SRV_CIDR="$2"
+	down_virt_iface "$SRV_VIRT_IFACE"
+	# remove all addresses
+	OLD_CIDR_LIST="$(show_addr_virt_iface "$SRV_VIRT_IFACE")"
+	for OLD_CIDR in $OLD_CIDR_LIST; do
+		ip addr del "$OLD_CIDR" dev "$SRV_VIRT_IFACE"
+		OLD_CIDR="$(show_addr_virt_iface "$SRV_VIRT_IFACE")"
+	done
+	
+	ip addr add "$SRV_CIDR" dev "$SRV_VIRT_IFACE"
+	up_virt_iface "$SRV_VIRT_IFACE"
+}
+
+show_virt_iface(){
+	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
+        test_iface "$VIRTUAL_IFACE" || die "Virtual interface not created"
+	LANG=C ip a show dev "$VIRTUAL_IFACE" |sed -ne  "/^[[:blank:]]*inet[[:blank:]]/{s%^[[:blank:]]*%%;p}"
+}
+
+show_addr_virt_iface(){
+	show_virt_iface "$(get_virt_iface "$1")" |cut -d " " -f2
 }
 
 create_virt_iface(){
 	# create virtual interface over physical interface
 	# currently supports only macvtap mode bridge
 	# parameters:
-	VIRTUAL_IFACE="$1"	# -> VIRT_IFACE_NAME
-	PHYSICAL_IFACE="$2"	# -> PHYS_IFACE
+	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
+	PHYSICAL_IFACE="$(get_phys_iface "$2")"	# -> PHYS_IFACE
 
 	ip link add "$VIRTUAL_IFACE" link "$PHYSICAL_IFACE" type macvlan mode bridge
+}
+
+delete_virt_iface(){
+	# delete virtual interface over physical interface
+	# parameters:
+	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
+	PHYSICAL_IFACE="$(get_phys_iface "$2")"	# -> PHYS_IFACE
+	down_virt_iface "$VIRTUAL_IFACE"
+	ip link del "$VIRTUAL_IFACE"
 }
 
 get_domain(){
@@ -76,7 +146,6 @@ get_iface_cidr(){
 	# prints IP/NETMASK from specified interface
 	# parameters:
 	IFACE_NAME="$1"
-
 	LANG=C ip addr show "$IFACE_NAME" |sed -ne "/[[:blank:]]*inet[[:blank:]]/{s%^.*inet[[:blank:]]%%;s%[[:blank:]].*$%%;p}"
 }
 
@@ -161,8 +230,7 @@ get_srv_cidr(){
 	# and returns the nth ip in the related subnet
 	# parameters:
 	CIDR="$1" 	# IP/MASK
-	IP_NUMBER="$2"  # -> subnet IP position
-	
+	IP_NUMBER="$(get_ip_number "$2")"  # -> subnet IP position
 	# separate IP / MASK & calculate HOST_NUMBITS
 	IP="${CIDR%/*}"
 	MASK="${CIDR#*/}"
@@ -171,7 +239,6 @@ get_srv_cidr(){
 	# verify subnet max number of hosts
 	MAX_HOST="$(echo "2^${HOST_NUMBITS} - 1" |bc)"
 	[ $IP_NUMBER -le $MAX_HOST ] || die "Insufficient number of hosts in subnet"
-
 	# convert IP to binary
 	BIN_IP="$(ip2bin "$IP")"
 
@@ -184,7 +251,7 @@ get_srv_cidr(){
 
 	# concatenate to get binary server IP and convert to dot separated format
 	BIN_SRV_IP="${BIN_NET}${BIN_HOST}"
-	printf "$(bin2ip "$BIN_SRV_IP")/$MASK"
+	printf "$(bin2ip "$BIN_SRV_IP")/$MASK\n"
 }
 
 get_srv_ip(){
