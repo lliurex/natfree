@@ -91,16 +91,20 @@ up_virt_iface(){
 	ip link set "$VIRTUAL_IFACE" up
 }
 
-addr_virt_iface(){
+unset_virt_iface(){
 	SRV_VIRT_IFACE="$(get_virt_iface "$1")"
-	SRV_CIDR="$2"
 	down_virt_iface "$SRV_VIRT_IFACE"
 	# remove all addresses
 	OLD_CIDR_LIST="$(show_addr_virt_iface "$SRV_VIRT_IFACE")"
 	for OLD_CIDR in $OLD_CIDR_LIST; do
 		ip addr del "$OLD_CIDR" dev "$SRV_VIRT_IFACE"
-		OLD_CIDR="$(show_addr_virt_iface "$SRV_VIRT_IFACE")"
 	done
+}
+
+addr_virt_iface(){
+	SRV_VIRT_IFACE="$(get_virt_iface "$1")"
+	SRV_CIDR="$2"
+	unset_virt_iface "$SRV_VIRT_IFACE"
 	
 	ip addr add "$SRV_CIDR" dev "$SRV_VIRT_IFACE"
 	up_virt_iface "$SRV_VIRT_IFACE"
@@ -109,11 +113,12 @@ addr_virt_iface(){
 show_virt_iface(){
 	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
         test_iface "$VIRTUAL_IFACE" || die "Virtual interface not created"
-	LANG=C ip a show dev "$VIRTUAL_IFACE" |sed -ne  "/^[[:blank:]]*inet[[:blank:]]/{s%^[[:blank:]]*%%;p}"
+	LANG=C ip a show dev "$VIRTUAL_IFACE" |sed -e "s%^[[:digit:]]\+:[[:blank:]]*%%"
 }
 
 show_addr_virt_iface(){
-	show_virt_iface "$(get_virt_iface "$1")" |cut -d " " -f2
+	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
+	LANG=C ip a show dev "$VIRTUAL_IFACE" |sed -ne  "/^[[:blank:]]*inet[[:blank:]]/{s%^[[:blank:]]*%%;p}" |cut -d " " -f2
 }
 
 create_virt_iface(){

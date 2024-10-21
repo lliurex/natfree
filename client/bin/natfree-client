@@ -102,64 +102,39 @@ EOF
 			done
 			[ "$OK" ] || usage
                         [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			rm -f "$HOSTS_FILE"
+			update-hosts
 			;;
-i# recopile necessary data
-
-        # get DNS search domain from resolv.conf (if any)
-        SEARCH_DOMAIN="$(get_domain)"
-        [ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
-
-        # get ip/mask in CIDR notation
-        CIDR="$(get_iface_cidr "$GW_IFACE")"
-        [ "$CIDR" ] || die "Unable to retrieve IP address from $GW_IFACE"
-
-        # get SRV_IP_NUMBER available ip in subnet
-        SRV_IP="$(get_srv_ip "$CIDR" "$SRV_IP_NUMBER")"
-
-        # generate .hosts file
-        echo "# BEGIN arithmetic-server IPs" > "$HOSTS_FILE"
-        generate_hosts "${SRV_IP}:${SRV_ALIASES}${SEARCH_DOMAIN}" >> "$HOSTS_FILE"
-        echo "# END arithmetic-server IPs" >> "$HOSTS_FILE"
-
-        # update /etc/hosts
-        update-hosts
-
-                U*)
+		U*)
 			ACTION="UPDATE"
-                        echo "$ACTION" |grep -q "^$A" || usage
+			echo "$ACTION" |grep -q "^$A" || usage
                         [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+
+			# recopile necessary data
+			# get DNS search domain from resolv.conf (if any)
+			SEARCH_DOMAIN="$(get_domain)"
+			[ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
+
+			# get ip/mask in CIDR notation
+			CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
+			[ "$CIDR" ] || die "Unable to retrieve IP address from $CLIENT_IFACE"
+
+			# get SRV_IP_NUMBER available ip in subnet
+			SRV_IP="$(get_srv_ip "$CIDR" "$SRV_IP_NUMBER")"
+                        [ -z "$DEBUG" ] || echo "  -- Server IP: [ $SRV_IP ]"
+
+		        # generate .hosts file
+		        echo "# BEGIN arithmetic-server IPs" > "$HOSTS_FILE"
+		        generate_hosts "${SRV_IP}:${SRV_ALIASES}${SEARCH_DOMAIN}" >> "$HOSTS_FILE"
+		        echo "# END arithmetic-server IPs" >> "$HOSTS_FILE"
+
+		        # update /etc/hosts
+		        update-hosts
 			;;
 		*)
 			usage
 			;;
-                esac
-
-		# validate
-                shift
-        done
-
-
-	# recopile necessary data
-
-	# get DNS search domain from resolv.conf (if any)
-	SEARCH_DOMAIN="$(get_domain)"
-	[ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
-
-	# get ip/mask in CIDR notation
-	CIDR="$(get_iface_cidr "$GW_IFACE")"
-	[ "$CIDR" ] || die "Unable to retrieve IP address from $GW_IFACE"
-
-	# get SRV_IP_NUMBER available ip in subnet
-	SRV_IP="$(get_srv_ip "$CIDR" "$SRV_IP_NUMBER")"
-
-	# generate .hosts file
-	echo "# BEGIN arithmetic-server IPs" > "$HOSTS_FILE"
-	generate_hosts "${SRV_IP}:${SRV_ALIASES}${SEARCH_DOMAIN}" >> "$HOSTS_FILE"
-	echo "# END arithmetic-server IPs" >> "$HOSTS_FILE"
-
-	# update /etc/hosts
-	update-hosts
-
+        esac
 
 }
 

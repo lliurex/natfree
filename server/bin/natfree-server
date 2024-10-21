@@ -1,0 +1,157 @@
+#!/bin/sh
+
+###############
+# global vars #
+###############
+
+# load common functions
+. /usr/share/natfree-common/natfree-common
+
+SRV_PHYS_IFACE="$(get_phys_iface)"
+SRV_VIRT_IFACE="$(get_virt_iface)"
+IP_NUMBER="$(get_ip_number)"
+
+
+#############
+# functions #
+#############
+
+usage(){
+        die "Usage" "$(basename "$0") [ OPTIONS ] COMMAND"  \
+            "       OPTIONS:" \
+            "           -i PHYS_IFACE : physical interface name (defaults to $SRV_PHYS_IFACE)" \
+            "           -v VIRT_IFACE : virtual interface name (defaults to $SRV_VIRT_IFACE)" \
+            "           -d            : debug mode (verbose)" \
+            "       COMMAND:" \
+            "           CONFIGURE|SET [CIDR|NUM]: configure interface virtual" \
+            "           UNCONFIGURE|UNSET       : remove configuration from virtual interface" \
+            "           SHOW|STATUS             : show interface configuration" \
+            "Command names can be used in lower or upper case and abbreviated down to a single letter." \
+            "Where there is ambiguity, dictionary order is used to select a command."
+}
+
+
+
+main(){
+
+	# check parameters
+
+        [ "$1" ] || usage
+        OPTIONS=""
+        while echo "$1" | grep -q "^-" ; do
+                case "$1" in
+                        -v)
+                                [ "$#" -ge 3 ] || usage
+                                shift
+                                SRV_VIRT_IFACE="$(get_virt_iface "$1")"
+                                ;;
+                        -i)
+                                [ "$#" -ge 3 ] || usage
+                                shift
+                                SRV_PHYS_IFACE="$(get_phys_iface "$1")"
+                                ;;
+                        -d)
+                                DEBUG="Y"
+                                ;;
+                        *)
+                                usage
+                                ;;
+                esac
+                OPTIONS="$OPTIONS $1"
+                shift
+        done
+
+        # check commands
+        [ "$1" ] || usage
+
+        if [ "$DEBUG" ] ; then
+                cat << EOF
+- Options selected  : [$OPTIONS ]
+- Virtual interface : [ $SRV_VIRT_IFACE ]
+- Physical interface: [ $SRV_PHYS_IFACE ]
+EOF
+        fi
+
+
+        A="$(echo "$1" |tr "[:lower:]" "[:upper:]")"
+
+        case "$A" in
+                C*|S|SE*)
+                        ACTION="CONFIGURE SET"
+			OK=""
+                        for a in $ACTION ; do
+                                if echo "$a" |grep -q "^$A" ; then
+                                       OK="Y"
+                                fi
+                        done
+                        [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			shift
+			CIDR_NUM="$IP_NUMBER"
+			if [ "$1" ] ; then
+				CIDR_NUM="$1"
+			fi
+                        [ -z "$DEBUG" ] || echo "  -- parameters: [ $CIDR_NUM ]"
+			natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" ADDRESS "$CIDR_NUM"
+
+			# update server n4d variables
+			# extract SRV_IP
+			SRV_CIDR="$(get_iface_cidr "$SRV_VIRT_IFACE")"
+			SRV_IP="${SRV_CIDR%/*}"
+
+			# TODO: please avoid this dirty trick ...
+			# BEGIN 
+			N4DVARS_DIR="/var/lib/n4d/variables"
+			N4DVARS_FILES="SRV_IP,$SRV_IP CLIENT_LDAP_URI,ldaps://$SRV_IP CLIENT_LDAP_URI_NOSSL,ldap://$SRV_IP"
+			N4DVARS_BACKUP_DIR="/tmp/n4dvars-backup/$(date "+%s")"
+			mkdir -p "$N4DVARS_BACKUP_DIR"
+			for f in $N4DVARS_FILES ; do
+				VAR_FILE="${N4DVARS_DIR}/${f%,*}"
+				VAR_VALUE="${f#*,}"
+				if [ -e "$VAR_FILE" ] ; then
+					# make a copy
+					BASENAME_FILE="$(basename "$VAR_FILE")"
+					cp "$VAR_FILE" "$N4DVARS_BACKUP_DIR/${BASENAME_FILE}"
+					sed -i -e "/\"value\":/s%:.*$%: \"$VAR_VALUE\",%" "$VAR_FILE"
+				fi
+			done
+			service n4d restart
+			# END
+
+			;;
+                U*)
+                        ACTION="UNCONFIGURE UNSET"
+			OK=""
+                        for a in $ACTION ; do
+                                if echo "$a" |grep -q "^$A" ; then
+                                       OK="Y"
+                                fi
+                        done
+                        [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+
+			exec natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" UNSET
+			;;
+
+		SH*|ST*)
+			ACTION="STATUS SHOW"
+			OK=""
+                        for a in $ACTION ; do
+                                if echo "$a" |grep -q "^$A" ; then
+                                       OK="Y"
+                                fi
+                        done
+                        [ "$OK" ] || usage
+
+                        [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			exec natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" SHOW
+			;;
+	esac
+
+
+}
+
+################
+# main program #
+################
+main "$@"
+exit 0
+

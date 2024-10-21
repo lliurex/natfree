@@ -16,6 +16,7 @@ SRV_PHYS_IFACE=""
 CIDR=""
 ACTION=""
 DEBUG=""
+FORCE=""
 
 # load common functions
 . /usr/share/natfree-common/natfree-common
@@ -32,14 +33,16 @@ usage(){
             "       OPTIONS:" \
             "           -i PHYS_IFACE : physical interface name (defaults to $SRV_PHYS_IFACE)" \
             "           -v VIRT_IFACE : virtual interface name (defaults to $SRV_VIRT_IFACE)" \
+	    "           -f            : force (create interface if the COMMAND require it)" \
 	    "           -d            : debug mode (verbose)" \
 	    "       COMMAND:" \
-	    "           CREATE              : create interface" \
-	    "           DELETE              : delete interface" \
-	    "           SHOW                : show interface configuration" \
-	    "           ADDRESS [CIDR|+NUM] : show/set interface network address" \
-	    "           UP                  : bring interface up" \
-	    "           DOWN                : bring interface down" \
+	    "           CREATE                 : create interface" \
+	    "           DELETE                 : delete interface" \
+	    "           SHOW                   : show interface configuration" \
+	    "           ADDRESS|SET [CIDR|+NUM]: show/set interface network address" \
+	    "           UNSET                  : remove interface address" \
+	    "           UP                     : bring interface up" \
+	    "           DOWN                   : bring interface down" \
             "Command names can be used in lower or upper case and abbreviated down to a single letter." \
 	    "Where there is ambiguity, dictionary order is used to select a command."
 }
@@ -61,6 +64,9 @@ main(){
 				[ "$#" -ge 3 ] || usage
 				shift
 				SRV_PHYS_IFACE="$(get_phys_iface "$1")"
+				;;
+			-f)
+				FORCE="Y"
 				;;
 			-d)
 				DEBUG="Y"
@@ -86,12 +92,19 @@ EOF
 	A="$(echo "$1" |tr "[:lower:]" "[:upper:]")"
 
 	case "$A" in
-		A*)
-			ACTION="ADDRESS"
-			echo "$ACTION" |grep -q "^$A" || usage
+		A*|S|SE*)
+			ACTION="ADDRESS SET"
+			OK=""
+                        for a in $ACTION ; do
+                                if echo "$a" |grep -q "^$A" ; then
+                                       OK="Y"
+                                fi
+                        done
+                        [ "$OK" ] || usage
+
 			[ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
 
-			if [ "$#" -ge 2 ] ; then
+			if [ "$#" -ge 2 ] && [ "$2" ] ; then
 				shift
 				CIDR="$1"
 				if echo "$1" |grep -q "^[[:digit:]]\+$" ; then
@@ -103,6 +116,8 @@ EOF
 
 				if echo "$CIDR" |grep -q "^\([[:digit:]]\+\.\)\{3\}[[:digit:]]\+/[[:digit:]]\+$" ; then
 					[ -z "$DEBUG" ] || echo "  --  cidr: [ $CIDR ]"
+					[ -z "$FORCE" ] || create_virt_iface "$SRV_VIRT_IFACE" "$SRV_PHYS_IFACE" 2>/dev/null
+
 					addr_virt_iface "$SRV_VIRT_IFACE" "$CIDR"
 				else
 					die "Invalid parameter: $CIDR"
@@ -134,16 +149,30 @@ EOF
 			test_iface "$SRV_VIRT_IFACE" || die "Virtual interface not created"
 			down_virt_iface "$SRV_VIRT_IFACE"
 			;;
-		S*)
-			ACTION="SHOW"
-			echo "$ACTION" |grep -q "^$A" || usage
+		SH*|ST*)
+			ACTION="SHOW STATUS"
+			OK=""
+                        for a in $ACTION ; do
+                                if echo "$a" |grep -q "^$A" ; then
+                                       OK="Y"
+                                fi
+                        done
+                        [ "$OK" ] || usage
+
 			[ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
 			show_virt_iface "$SRV_VIRT_IFACE"
 			;;
-		U*)
+		U|UN*)
+			ACTION="UNSET"
+			echo "$ACTION" |grep -q "^$A" || usage
+			[ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			unset_virt_iface "$SRV_VIRT_IFACE"
+			;;
+		UP)
 			ACTION="UP"
 			echo "$ACTION" |grep -q "^$A" || usage
 			[ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			[ -z "$FORCE" ] || create_virt_iface "$SRV_VIRT_IFACE" "$SRV_PHYS_IFACE" 2>/dev/null
 			test_iface "$SRV_VIRT_IFACE" || die "Virtual interface not created"
 			up_virt_iface "$SRV_VIRT_IFACE"
 			;;
