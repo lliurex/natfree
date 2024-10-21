@@ -1,3 +1,0 @@
-/usr/bin/natfree-update-server-arithmetic		/usr/bin/natfree-update-server
-/usr/share/natfree-server/natfree-server-arithmetic	/etc/network/if-up.d/natfree-server
-/usr/share/natfree-server/natfree-server-arithmetic	/usr/lib/networkd-dispatcher/routable.d/natfree-server

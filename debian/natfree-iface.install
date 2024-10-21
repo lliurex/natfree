@@ -1,0 +1,3 @@
+iface/bin/*	/usr/bin
+iface/usr/*	/usr
+
