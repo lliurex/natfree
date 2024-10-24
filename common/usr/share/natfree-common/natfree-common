@@ -258,10 +258,17 @@ get_srv_cidr(){
 	IP="${CIDR%/*}"
 	MASK="${CIDR#*/}"
 	HOST_NUMBITS=$((32 - $MASK))
-
 	# verify subnet max number of hosts
 	MAX_HOST="$(echo "2^${HOST_NUMBITS} - 1" |bc)"
-	[ $IP_NUMBER -le $MAX_HOST ] || die "Insufficient number of hosts in subnet"
+
+	# check for negative IP_NUMBER
+	if echo "x$IP_NUMER" |grep -q "^x-" ; then
+		# negative, so redefine IP_NUMBER to MAX_HOSTS + (-NUMBER)
+		IP_NUMBER=$(($MAX_HOSTS + $IP_NUMBER))
+	fi
+	[ $IP_NUMBER -le 0 ] || die "Insufficient number of hosts in subnet"
+	[ $IP_NUMBER -lt $MAX_HOST ] || die "Insufficient number of hosts in subnet"
+		
 	# convert IP to binary
 	BIN_IP="$(ip2bin "$IP")"
 
