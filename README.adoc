@@ -1,0 +1,172 @@
+= natfree
+Luis Garcia
+:compat-mode:
+:toc:
+:icons: font
+:toc-title: Index
+:toclevels: 3
+:doctype: article
+:experimental:
+:icons: font
+:sectanchors:
+:sectlinks:
+:sectnums:
+:imagesdir: ./images
+
+== Overview
+
+The natfree package is a suite of tools to auto discover services in "hostile" network environments managed by third parties.
+The suite can be used to configure servers and workstations without the need for specific DNS or DHCP settings.
+
+The default values of the parameters are obtained sourcing the files (with extension .cfg) from the /etc/natfree-d directory.
+[source]
+$ tree /etc/natfree.d/
+/etc/natfree.d/
+└── 00-natfree-common.cfg
+
+
+image::natfree.drawio.svg[]
+
+
+
+== Components
+
+=== nafree-iface
+Swiss army tool to manage natfree virtual interface.  The natfree-iface cli tool mimics in a simplified way the syntax of the ip command, and provides default values for most parameters  sourcing files with .cfg extension from the /etc/natfree-d directory.
+Run the script with option -h or no parameters to get help.
+
+[source]
+$ natfree-iface
+Usage: natfree-iface [ OPTIONS ] COMMAND
+       OPTIONS:
+           -i PHYS_IFACE : physical interface name (defaults to eth1)
+           -v VIRT_IFACE : virtual interface name (defaults to natfree00)
+           -f            : force (create interface if the COMMAND require it)
+           -d            : debug mode (verbose)
+       COMMAND:
+           CREATE                 : create interface
+           DELETE                 : delete interface
+           SHOW                   : show interface configuration
+           ADDRESS|SET [CIDR|NUM] : show/set interface network address
+           UNSET                  : remove interface address
+           UP                     : bring interface up
+           DOWN                   : bring interface down
+Command names can be used in lower or upper case and abbreviated down to a single letter.
+Where there is ambiguity, dictionary order is used to select a command.
+
+
+
+Examples:
+[source]
+natfree-iface -i eth0 -v natfree00 CREATE    # creates virtual interface 'natfree00' over physical 'et0'
+natfree-iface -v natfree00  SET 10.10.0.5/16 # configure 'natfree00' with IP '10.10.0.5'
+natfree-iface -v natfree00 -i eth0 SET 4     # configure 'natfree00' with the address of the 4th host in 'eth0' network
+
+The package also installs a script in '/usr/share/natfree-iface/natfree-iface' and links it in
+- /etc/network/if-up.d/natfree-iface
+- /usr/lib/networkd-dispatcher/routable.d/natfree-iface
+
+*This script automatically creates the virtual interface when the physical interface brings up, but NO IP is configured by default.*
+
+=== natfree-client
+The natfree-client uses "update-host" tool to configure /etc/hosts (using previously agreed ip arithmetic) in order to discover services when network interface brings up. The package also provides the "natfree-client" cli for further adjustments.
+
+[source]
+$ natfree-client
+Usage: natfree-client [ OPTIONS ] COMMAND
+       OPTIONS:
+           -p NUMBER       : IP number/position in subnet (defults to 4)
+           -a ALIASES_LIST : comma separated list of names (defaults to server,srv,servidor,fs,mirror,lliurex-mirror,cups,www,ntp,share,jclic-aula,lliurexlab,error,ipxboot,admin-center)
+           -d              : debug mode (verbose)
+           -m MODE [PARAM] : MODE to use (defaults to i):
+              -m i[nterface] [PHYS_IFACE] : get network addres from physical interface
+                                            and use IP arithmetic. (defaults to eth1)
+              -n n[etwork] [SRV_NETWORK]  : use provided CIDR (IP/MASK) to determine server network
+                                            and use IP arithmetic. (defaults to )
+              -n f[ixed]   [FIXED_ADDRESS]: use provided IP for server address, no arithmetic.
+                                            (defaults to )
+              -n d[hcp]                   : use dhcp to determine server network and use IP arithmetic
+                                            (NOT implemented yet)
+ 
+
+
+As in the case of 'natfree-iface', the package includes the script '/usr/share/natfree-client/natfree-client' and links it in '/etc/network/if-up.d/' and '/usr/lib/networkd-dispatcher/routable.d/' *to configure '/etc/hosts' when the physical interface is up*, so that the server can be resolved by DNS as soon as possible.
+
+=== natfree-server
+The natfree-server uses "natfree-iface" installs the "natfree-server" command line utility. This tool provides a wrapper to "natfree-iface" in order to create a natfree virtual interface and configure it automatically (using  previously agreed ip arithmetic).
+[source]
+$ natfree-server 
+Usage: natfree-server [ OPTIONS ] COMMAND
+       OPTIONS:
+           -i PHYS_IFACE : physical interface name (defaults to eth1)
+           -v VIRT_IFACE : virtual interface name (defaults to natfree00)
+           -d            : debug mode (verbose)
+       COMMAND:
+           CONFIGURE|SET [CIDR|NUM]: configure interface virtual
+           UNCONFIGURE|UNSET       : remove configuration from virtual interface
+           SHOW|STATUS             : show interface configuration
+Command names can be used in lower or upper case and abbreviated down to a single letter.
+Where there is ambiguity, dictionary order is used to select a command.
+
+When the package 'natfree-server' is installed, the behavior during network startup is slightly modified compared to the case when only 'natfree-iface' is installed.
+With both packages installed, during network initialization, in addition to virtual interface creation, an attempt will be made to automatically configure the IP address from the stored default values.
+
+== natfree configuration files
+The natfree configuration files are shell to store default values for the natfree parameters by defining and assigning environment variables. The operation is similar to the use of files in /etc/default to parameterize the startup of services.
+
+The configurarion directory is '/etc/natfree.d/' . Files must have '.cfg.' extension. Files with any other extension are ignored. Files are included (via the 'source' command) in alphabetical order, so values can be permanently overwritten by dropping conveniently numbered files in the configurarion folder.
+
+The package default values are in the file '/etc/natfree.d/00-natfree-common.cfg', provided by package 'natfree-common'. The environment variables values can be overriden temporarily using parameters when invoking the natfree command line tools.
+
+[source]
+ # Current default values in '/etc/natfree.d/00-natfree-common.cfg'
+ # common parameters
+ #
+ # IP position/number. Equivalent to '-p' in 'natfree-client'
+ NF_DEF_IP_NUMBER=4
+ # 
+ # server specific
+ NF_DEF_VIRT_IFACE="natfree00"
+ NF_DEF_PHYS_IFACE="$(get_gw_iface)"
+ # 
+ # client specific:
+ NF_DEF_SRV_ALIASES="server,srv,servidor,fs,mirror,lliurex-mirror,cups,www,ntp,share,jclic-aula,lliurexlab,error,ipxboot,admin-center"
+ # 
+ # client configuration mode. Equivalent to '-m interface'
+ NF_DEF_MODE="interface"
+ # 
+ # interface to determinte network and apply arithmetic. Equivalent to '-i'
+ NF_DEF_CLIENT_IFACE="$(get_gw_iface)"
+ # 
+ # set a server address. Equivalent to '-f'
+ NF_DEF_SRV_ADDR=""
+ # 
+ # set a server network (IP/MASK). Equivalent to '-n'
+ NF_DEF_SRV_NET=""
+
+'Note:' *$(get_gw_iface)* allows to detect the interface associated to default route in network route table.
+
+Examples:
+[source]
+ # '/etc/natfree.d/10-laptop-trolley-default.cfg' file
+ # example of natfree additional configuration for
+ # the first laptop trolley
+ #
+ # set the server network (IP/MASK)
+ NF_DEF_SRV_NET="192.168.30.10/20"
+ #
+ # client configuration mode to use the supplied netwrok address
+ NF_DEF_MODE="network"
+
+ # '/etc/natfree.d/12-laptop-trolley-n2.cfg' file
+ # example of additional configuration for
+ # the second laptop trolley
+ #
+ # assuming that teacher's network is the same for trolley n.2
+ # and file '/etc/natfree.d/10-laptop-trolley-default.cfg' is also installed,
+ # just choose another position for the server within the network
+ NF_DEF_IP_NUMBER=5
+
+  
+
+ 
