@@ -39,7 +39,7 @@ usage(){
 	    "           CREATE                 : create interface" \
 	    "           DELETE                 : delete interface" \
 	    "           SHOW                   : show interface configuration" \
-	    "           ADDRESS|SET [CIDR|+NUM]: show/set interface network address" \
+	    "           ADDRESS|SET [CIDR|NUM] : show/set interface network address" \
 	    "           UNSET                  : remove interface address" \
 	    "           UP                     : bring interface up" \
 	    "           DOWN                   : bring interface down" \
@@ -53,7 +53,7 @@ main(){
 
 	[ "$1" ] || usage
 	OPTIONS=""
-	while echo "$1" | grep -q "^-" ; do
+	while echo "x$1" | grep -q "^x-" ; do
 		case "$1" in
 			-v)
 				[ "$#" -ge 3 ] || usage

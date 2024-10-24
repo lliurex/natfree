@@ -48,8 +48,12 @@ test_iface(){
 get_var_value(){
 	NEW_VAL="$1"
 	DEF_VAL="$2"
+	if [ -z "$DEF_VAL" ] ; then
+		echo "$1"
+		return
+	fi
 	[ "$1" ] || NEW_VAL="$DEF_VAL"
-	[ "$2" ] || die "Invalid default value"
+	[ "$NEW_VAL" ] || die "Invalid default value"
 	echo "$NEW_VAL"
 }
 
@@ -74,9 +78,23 @@ get_ip_number(){
 	get_var_value "$IP0" "$NF_DEF_IP_NUMBER"
 }
 
+get_client_mode(){
+	cmode="$(echo "$1" |tr "[:upper:]" "[:lower:]")"
+	get_var_value "$cmode" "$NF_DEF_MODE"
+}
+
+get_srv_net(){
+	get_var_value "$1" "$NF_DEF_SRV_NET"
+
+}
+
+get_srv_addr(){
+	get_var_value "$1" "$NF_DEF_SRV_ADDR"
+}
+
 test_virt_iface(){
 	test_iface "$(get_virt_iface "$1")" || return 1
-	return 0
+	return "...."
 }
 
 down_virt_iface(){

@@ -32,7 +32,7 @@ Description: natfree client tool
 
 Package: natfree-server
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), natfree-iface (= ${binary:Version})
 Description: natfree server tool
  The natfree-server uses "natfree-iface" tool to create a
  natfree virtual interface and configures it (using  previously

@@ -26,18 +26,29 @@ IP_NUMBER="$(get_ip_number)"
 # List of servers aliases to write (comma separated)
 # TODO: revise list ...
 SRV_ALIASES="$(get_srv_aliases)"
+SRV_CIDR="$(get_srv_net)"
+CLIENT_MODE="$(get_client_mode)"
+SRV_ADDRESS="$(get_srv_addr)"
 
 usage(){
         die "Usage" "$(basename "$0") [ OPTIONS ] COMMAND"  \
             "       OPTIONS:" \
-            "           -i PHYS_IFACE : physical interface name (defaults to $CLIENT_IFACE)" \
-	    "           -n NUMBER     : IP number/position in subnet (defults to $IP_NUMBER)" \
-	    "           -a ALIASES_LIST: comma separated list of names (defaults to $SRV_ALIASES)" \
-            "           -d            : debug mode (verbose)" \
+	    "           -p NUMBER       : IP number/position in subnet (defults to $IP_NUMBER)" \
+	    "           -a ALIASES_LIST : comma separated list of names (defaults to $SRV_ALIASES)" \
+            "           -d              : debug mode (verbose)" \
+	    "           -m MODE [PARAM] : MODE to use (defaults to $CLIENT_MODE):" \
+	    "              -m i[nterface] [PHYS_IFACE] : get network addres from physical interface" \
+	    "                                            and use IP arithmetic. (defaults to $CLIENT_IFACE)" \
+	    "              -n n[etwork] [SRV_NETWORK]  : use provided CIDR (IP/MASK) to determine server network" \
+	    "                                            and use IP arithmetic. (defaults to $SRV_CIDR)" \
+	    "              -n f[ixed]   [FIXED_ADDRESS]: use provided IP for server address, no arithmetic." \
+	    "                                            (defaults to $SRV_ADDRESS)" \
+	    "              -n d[hcp]                   : use dhcp to determine server network and use IP arithmetic" \
+	    "                                            (NOT implemented yet)" \ 
             "       COMMAND:" \
-            "           UPDATE        : update /etc/hosts file" \
-            "           DESTROY|DELETE: remove data from /etc/hosts file" \
-            "Command names can be used in lower or upper case and abbreviated down to a single letter." \
+            "           UPDATE          : update /etc/hosts file" \
+            "           DESTROY|DELETE  : remove data from /etc/hosts file" \
+            "Command and mode names can be used in lower or upper case and abbreviated down to a single letter." \
             "Where there is ambiguity, dictionary order is used to select a command."
 }
 
@@ -49,22 +60,60 @@ main(){
 
         [ "$1" ] || usage
         OPTIONS=""
-        while echo "$1" | grep -q "^-" ; do
+        while echo "x$1" | grep -q "^x-" ; do
+                OPTIONS="$OPTIONS $1"
                 case "$1" in
-                        -i)
-                                [ "$#" -ge 3 ] || usage
-                                shift
-                                CLIENT_IFACE="$(get_client_iface "$1")"
-                                ;;
 			-a)
                                 [ "$#" -ge 3 ] || usage
                                 shift
 				SRV_ALIASES="$(get_srv_aliases "$1")"
 				;;
-			-n)
+			-p)
                                 [ "$#" -ge 3 ] || usage
                                 shift
 				IP_NUMBER="$(get_ip_number "$1")"
+				;;
+			-f)	
+                                [ "$#" -ge 3 ] || usage
+                                shift
+				SRV_ADDRESS="$(get_srv_addr "$1")"
+				;;
+			-m)	
+                                [ "$#" -ge 3 ] || usage
+                                shift
+				CLIENT_MODE="$(get_client_mode "$1")"
+                		case "$CLIENT_MODE" in
+                        		i*)
+						OPTION="interface"
+						echo "$OPTION" |grep -q "^$CLIENT_MODE" || usage
+                                		if [ "$2" ] ; then
+                                			CLIENT_IFACE="$(get_client_iface "$2")"
+                                			shift
+						fi
+                                		;;
+					n*)	
+						OPTION="network"
+						echo "$OPTION" |grep -q "^$CLIENT_MODE" || usage
+                                		if [ "$2" ] ; then
+							SRV_CIDR="$(get_srv_net "$2")"
+                                			shift
+						fi
+						;;
+					f*)	
+						OPTION="force"
+						echo "$OPTION" |grep -q "^$CLIENT_MODE" || usage
+                                		if [ "$2" ] ; then
+							SRV_ADDRESS="$(get_srv_addr "$2")"
+                                			shift
+						fi
+						;;
+					*)
+						usage
+						;;
+
+
+				esac
+
 				;;
 
                         -d)
@@ -74,10 +123,8 @@ main(){
                                 usage
                                 ;;
                 esac
-                OPTIONS="$OPTIONS $1"
                 shift
         done
-
         [ "$1" ] || usage
 
         if [ "$DEBUG" ] ; then
@@ -85,7 +132,10 @@ main(){
 - Options selected  : [$OPTIONS ]
 - Physical interface: [ $CLIENT_IFACE ]
 - IP number         : [ $IP_NUMBER ]
+- Server IP         : [ $SRV_ADDRESS ]
 - Server aliases    : [ $SRV_ALIASES ]
+- Server network    : [ $SRV_CIDR ]
+- Client mode       : [ $CLIENT_MODE ]
 EOF
         fi
 
@@ -115,12 +165,28 @@ EOF
 			SEARCH_DOMAIN="$(get_domain)"
 			[ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
 
-			# get ip/mask in CIDR notation
-			CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
-			[ "$CIDR" ] || die "Unable to retrieve IP address from $CLIENT_IFACE"
+			case "$CLIENT_MODE" in
+				i*|d*)
+					# TODO: dhcp case ...
+					# get ip/mask in CIDR notation
+					CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
+					[ "$CIDR" ] || die "Unable to retrieve IP address from $CLIENT_IFACE"
+					# get SRV_IP_NUMBER available ip in subnet
+					SRV_IP="$(get_srv_ip "$CIDR" "$SRV_IP_NUMBER")"
+					;;
+				n*)
+					# use provided SRV_CIDR
+	                                CIDR="$(get_srv_net "$SRV_CIDR")"
+					[ "$CIDR" ] || die "Invalid CIDR value"
+					# get SRV_IP_NUMBER available ip in subnet
+					SRV_IP="$(get_srv_ip "$CIDR" "$SRV_IP_NUMBER")"
+					;;
+				f*)
+					SRV_IP="$(get_srv_addr "$SRV_ADDRESS")"
+					;;
+			esac
 
-			# get SRV_IP_NUMBER available ip in subnet
-			SRV_IP="$(get_srv_ip "$CIDR" "$SRV_IP_NUMBER")"
+			[ "$SRV_IP" ] || die "Invalid server IP"
                         [ -z "$DEBUG" ] || echo "  -- Server IP: [ $SRV_IP ]"
 
 		        # generate .hosts file

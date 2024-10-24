@@ -1,3 +1,9 @@
+natfree (0.91) unstable; urgency=medium
+
+  * New methods for update and new syntax for natfree-client.
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Wed, 23 Oct 2024 12:02:25 +0200
+
 natfree (0.9) unstable; urgency=medium
 
   * Fixed networkd-dispatcher scripts. 
