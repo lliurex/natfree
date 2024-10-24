@@ -1,5 +1,0 @@
-/usr/share/natfree-client/natfree-client	/etc/network/if-up.d/natfree-client
-/usr/share/natfree-client/natfree-client	/usr/lib/networkd-dispatcher/routable.d/natfree-client
-
-
-
