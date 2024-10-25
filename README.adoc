@@ -39,18 +39,18 @@ Run the script with option -h or no parameters to get help.
 $ natfree-iface
 Usage: natfree-iface [ OPTIONS ] COMMAND
        OPTIONS:
-           -i PHYS_IFACE : physical interface name (defaults to eth1)
+           -i PHYS_IFACE : physical interface name (defaults to wlan0)
            -v VIRT_IFACE : virtual interface name (defaults to natfree00)
            -f            : force (create interface if the COMMAND require it)
            -d            : debug mode (verbose)
        COMMAND:
-           CREATE                 : create interface
-           DELETE                 : delete interface
-           SHOW                   : show interface configuration
-           ADDRESS|SET [CIDR|NUM] : show/set interface network address
-           UNSET                  : remove interface address
-           UP                     : bring interface up
-           DOWN                   : bring interface down
+           CREATE                   : create interface
+           DELETE                   : delete interface
+           SHOW                     : show interface configuration
+           ADDRESS|SET [CIDR|(-)NUM]: show/set interface network address
+           UNSET                    : remove interface address
+           UP                       : bring interface up
+           DOWN                     : bring interface down
 Command names can be used in lower or upper case and abbreviated down to a single letter.
 Where there is ambiguity, dictionary order is used to select a command.
 
