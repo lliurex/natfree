@@ -93,7 +93,10 @@ Usage: natfree-client [ OPTIONS ] COMMAND
 As in the case of 'natfree-iface', the package includes the script '/usr/share/natfree-client/natfree-client' and links it in '/etc/network/if-up.d/' and '/usr/lib/networkd-dispatcher/routable.d/' *to configure '/etc/hosts' when the physical interface is up*, so that the server can be resolved by DNS as soon as possible.
 
 === natfree-server
-The natfree-server uses "natfree-iface" installs the "natfree-server" command line utility. This tool provides a wrapper to "natfree-iface" in order to create a natfree virtual interface and configure it automatically (using  previously agreed ip arithmetic).
+The natfree-server package installs the 'natfree-server' command line utility. This tool provides a wrapper to 'natfree-iface' in order to create a natfree virtual interface and configure it automatically (using  previously agreed ip arithmetic). 
+The intended use of the package is the installation on LliureX classroom servers to achieve a new model in which the internal classroom network is not necessary and the virtual interface is used for services and client access. 
+In addition to configuring the virtual interface, nafree-server also modifies the values of the n4d variables that depend on the IP address of the server to show the address of the virtual interface.
+
 [source]
 $ natfree-server 
 Usage: natfree-server [ OPTIONS ] COMMAND
@@ -112,9 +115,9 @@ When the package 'natfree-server' is installed, the behavior during network star
 With both packages installed, during network initialization, in addition to virtual interface creation, an attempt will be made to automatically configure the IP address from the stored default values.
 
 == natfree configuration files
-The natfree configuration files are shell to store default values for the natfree parameters by defining and assigning environment variables. The operation is similar to the use of files in /etc/default to parameterize the startup of services.
+The natfree configuration files are shell scripts to be sourcered in order to get default values for the natfree parameters by defining and assigning environment variables. The operation is similar to the use of files in /etc/default to parameterize the startup of services.
 
-The configurarion directory is '/etc/natfree.d/' . Files must have '.cfg.' extension. Files with any other extension are ignored. Files are included (via the 'source' command) in alphabetical order, so values can be permanently overwritten by dropping conveniently numbered files in the configurarion folder.
+The configurarion directory is '/etc/natfree.d/'. Files must have '.cfg.' extension. Files with any other extension are ignored. Files are included (via the 'source' command) in alphabetical order, so values can be permanently overwritten by dropping conveniently numbered files in the configurarion folder.
 
 The package default values are in the file '/etc/natfree.d/00-natfree-common.cfg', provided by package 'natfree-common'. The environment variables values can be overriden temporarily using parameters when invoking the natfree command line tools.
 
