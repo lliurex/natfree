@@ -39,7 +39,7 @@ Run the script with option -h or no parameters to get help.
 $ natfree-iface
 Usage: natfree-iface [ OPTIONS ] COMMAND
        OPTIONS:
-           -i PHYS_IFACE : physical interface name (defaults to wlan0)
+           -i PHYS_IFACE : physical interface name (defaults to eth1)
            -v VIRT_IFACE : virtual interface name (defaults to natfree00)
            -f            : force (create interface if the COMMAND require it)
            -d            : debug mode (verbose)
@@ -53,7 +53,6 @@ Usage: natfree-iface [ OPTIONS ] COMMAND
            DOWN                     : bring interface down
 Command names can be used in lower or upper case and abbreviated down to a single letter.
 Where there is ambiguity, dictionary order is used to select a command.
-
 
 
 Examples:
@@ -89,7 +88,12 @@ Usage: natfree-client [ OPTIONS ] COMMAND
                                             (defaults to )
               -n d[hcp]                   : use dhcp to determine server network and use IP arithmetic
                                             (NOT implemented yet)
- 
+       COMMAND:
+           CONFIGURE|SET|UPDATE : update /etc/hosts file
+           DESTROY|DELETE       : remove data from /etc/hosts file
+Command and mode names can be used in lower or upper case and abbreviated down to a single letter.
+Where there is ambiguity, dictionary order is used to select a command.
+
 
 
 As in the case of 'natfree-iface', the package includes the script '/usr/share/natfree-client/natfree-client' and links it in '/etc/network/if-up.d/' and '/usr/lib/networkd-dispatcher/routable.d/' *to configure '/etc/hosts' when the physical interface is up*, so that the server can be resolved by DNS as soon as possible.
@@ -107,11 +111,12 @@ Usage: natfree-server [ OPTIONS ] COMMAND
            -v VIRT_IFACE : virtual interface name (defaults to natfree00)
            -d            : debug mode (verbose)
        COMMAND:
-           CONFIGURE|SET [CIDR|NUM]: configure interface virtual
-           UNCONFIGURE|UNSET       : remove configuration from virtual interface
-           SHOW|STATUS             : show interface configuration
+           CONFIGURE|SET|UPDATE [CIDR|NUM]: configure interface virtual
+           UNCONFIGURE|UNSET              : remove configuration from virtual interface
+           SHOW|STATUS                    : show interface configuration
 Command names can be used in lower or upper case and abbreviated down to a single letter.
 Where there is ambiguity, dictionary order is used to select a command.
+
 
 When the package 'natfree-server' is installed, the behaviour during network startup is slightly modified compared to the case when only 'natfree-iface' is installed.
 With both packages installed, during network initialization, in addition to virtual interface creation, an attempt will be made to automatically configure the IP address from the stored default values.
