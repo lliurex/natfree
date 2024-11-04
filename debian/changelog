@@ -1,3 +1,9 @@
+natfree (1.2) jammy; urgency=medium
+
+  * Minor fixes
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Mon, 04 Nov 2024 11:30:41 +0100
+
 natfree (1.1) jammy; urgency=medium
 
   * Added support for negative IP arithmetic
