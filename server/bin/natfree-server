@@ -23,9 +23,9 @@ usage(){
             "           -v VIRT_IFACE : virtual interface name (defaults to $SRV_VIRT_IFACE)" \
             "           -d            : debug mode (verbose)" \
             "       COMMAND:" \
-            "           CONFIGURE|SET [CIDR|NUM]: configure interface virtual" \
-            "           UNCONFIGURE|UNSET       : remove configuration from virtual interface" \
-            "           SHOW|STATUS             : show interface configuration" \
+            "           CONFIGURE|SET|UPDATE [CIDR|NUM]: configure interface virtual" \
+            "           UNCONFIGURE|UNSET              : remove configuration from virtual interface" \
+            "           SHOW|STATUS                    : show interface configuration" \
             "Command names can be used in lower or upper case and abbreviated down to a single letter." \
             "Where there is ambiguity, dictionary order is used to select a command."
 }
@@ -76,14 +76,15 @@ EOF
         A="$(echo "$1" |tr "[:lower:]" "[:upper:]")"
 
         case "$A" in
-                C*|S|SE*)
-                        ACTION="CONFIGURE SET"
+                UP*|C*|S|SE*)
+                        ACTION="CONFIGURE SET UPDATE"
 			OK=""
                         for a in $ACTION ; do
                                 if echo "$a" |grep -q "^$A" ; then
                                        OK="Y"
                                 fi
                         done
+			[ "$OK" ] || usage
                         [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
 			shift
 			CIDR_NUM="$IP_NUMBER"
@@ -126,6 +127,7 @@ EOF
                                        OK="Y"
                                 fi
                         done
+			[ "$OK" ] || usage
                         [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
 
 			exec natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" UNSET
