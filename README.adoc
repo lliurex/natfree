@@ -62,6 +62,8 @@ natfree-iface -i eth0 -v natfree00 CREATE    # creates virtual interface 'natfre
 natfree-iface -v natfree00  SET 10.10.0.5/16 # configure 'natfree00' with IP '10.10.0.5'
 natfree-iface -v natfree00 -i eth1 address 4 # configure 'natfree00' with the address of
                                              # the 4th host in 'eth1' network
+natfree-iface address -1                     # use default values and
+                                             # configure the penultimate address in network
 
 The package also installs a script in '/usr/share/natfree-iface/natfree-iface' and links it in
 * /etc/network/if-up.d/natfree-iface
