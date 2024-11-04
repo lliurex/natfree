@@ -44,10 +44,10 @@ usage(){
 	    "              -n f[ixed]   [FIXED_ADDRESS]: use provided IP for server address, no arithmetic." \
 	    "                                            (defaults to $SRV_ADDRESS)" \
 	    "              -n d[hcp]                   : use dhcp to determine server network and use IP arithmetic" \
-	    "                                            (NOT implemented yet)" \ 
+	    "                                            (NOT implemented yet)"  \
             "       COMMAND:" \
-            "           UPDATE          : update /etc/hosts file" \
-            "           DESTROY|DELETE  : remove data from /etc/hosts file" \
+            "           CONFIGURE|SET|UPDATE : update /etc/hosts file" \
+            "           DESTROY|DELETE       : remove data from /etc/hosts file" \
             "Command and mode names can be used in lower or upper case and abbreviated down to a single letter." \
             "Where there is ambiguity, dictionary order is used to select a command."
 }
@@ -155,9 +155,15 @@ EOF
 			rm -f "$HOSTS_FILE"
 			update-hosts
 			;;
-		U*)
-			ACTION="UPDATE"
-			echo "$ACTION" |grep -q "^$A" || usage
+		C*|S*|U*)
+			ACTION="CONFIGURE SET UPDATE"
+			OK=""
+			for a in $ACTION ; do
+				if echo "$a" |grep -q "^$A" ; then
+				       OK="Y"
+				fi
+			done
+			[ "$OK" ] || usage
                         [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
 
 			# recopile necessary data
