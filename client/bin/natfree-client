@@ -110,7 +110,7 @@ main(){
 					d*)	
 						OPTION="dhcp"
 						echo "$OPTION" | grep -q "^$CLIENT_MODE" || usage
-						
+						;;	
 					*)
 						usage
 						;;
@@ -177,7 +177,7 @@ EOF
 
 			case "$CLIENT_MODE" in
 				i*|d*)
-					if [[ $CLIENT_MODE == d* ]]; then
+					if [ `expr $CLIENT_MODE : '^d.*'` -gt 0 ]; then
 						CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)
 					else
 						CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
