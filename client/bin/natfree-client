@@ -39,15 +39,15 @@ usage(){
 	    "           -m MODE [PARAM] : MODE to use (defaults to $CLIENT_MODE):" \
 	    "              -m i[nterface] [PHYS_IFACE] : get network addres from physical interface" \
 	    "                                            and use IP arithmetic. (defaults to $CLIENT_IFACE)" \
-	    "              -n n[etwork] [SRV_NETWORK]  : use provided CIDR (IP/MASK) to determine server network" \
+	    "              -m n[etwork] [SRV_NETWORK]  : use provided CIDR (IP/MASK) to determine server network" \
 	    "                                            and use IP arithmetic. (defaults to $SRV_CIDR)" \
-	    "              -n f[ixed]   [FIXED_ADDRESS]: use provided IP for server address, no arithmetic." \
+	    "              -m f[ixed]   [FIXED_ADDRESS]: use provided IP for server address, no arithmetic." \
 	    "                                            (defaults to $SRV_ADDRESS)" \
-	    "              -n d[hcp]                   : use dhcp to determine server network and use IP arithmetic" \
-	    "                                            (NOT implemented yet)" \ 
+	    "              -m d[hcp]                   : use dhcp to determine server network and use IP arithmetic" \
+	    "                                            (NOT implemented yet)"  \
             "       COMMAND:" \
-            "           UPDATE          : update /etc/hosts file" \
-            "           DESTROY|DELETE  : remove data from /etc/hosts file" \
+            "           CONFIGURE|SET|UPDATE : update /etc/hosts file" \
+            "           DESTROY|DELETE       : remove data from /etc/hosts file" \
             "Command and mode names can be used in lower or upper case and abbreviated down to a single letter." \
             "Where there is ambiguity, dictionary order is used to select a command."
 }
@@ -107,6 +107,10 @@ main(){
                                 			shift
 						fi
 						;;
+					d*)	
+						OPTION="dhcp"
+						echo "$OPTION" | grep -q "^$CLIENT_MODE" || usage
+						
 					*)
 						usage
 						;;
@@ -155,9 +159,15 @@ EOF
 			rm -f "$HOSTS_FILE"
 			update-hosts
 			;;
-		U*)
-			ACTION="UPDATE"
-			echo "$ACTION" |grep -q "^$A" || usage
+		C*|S*|U*)
+			ACTION="CONFIGURE SET UPDATE"
+			OK=""
+			for a in $ACTION ; do
+				if echo "$a" |grep -q "^$A" ; then
+				       OK="Y"
+				fi
+			done
+			[ "$OK" ] || usage
                         [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
 
 			# recopile necessary data
@@ -167,19 +177,22 @@ EOF
 
 			case "$CLIENT_MODE" in
 				i*|d*)
-					# TODO: dhcp case ...
+					if [[ $CLIENT_MODE == d* ]]; then
+						CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)
+					else
+						CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
+					fi
 					# get ip/mask in CIDR notation
-					CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
 					[ "$CIDR" ] || die "Unable to retrieve IP address from $CLIENT_IFACE"
-					# get SRV_IP_NUMBER available ip in subnet
-					SRV_IP="$(get_srv_ip "$CIDR" "$SRV_IP_NUMBER")"
+					# get IP_NUMBER available ip in subnet
+					SRV_IP="$(get_srv_ip "$CIDR" "$IP_NUMBER")"
 					;;
 				n*)
 					# use provided SRV_CIDR
 	                                CIDR="$(get_srv_net "$SRV_CIDR")"
 					[ "$CIDR" ] || die "Invalid CIDR value"
-					# get SRV_IP_NUMBER available ip in subnet
-					SRV_IP="$(get_srv_ip "$CIDR" "$SRV_IP_NUMBER")"
+					# get IP_NUMBER available ip in subnet
+					SRV_IP="$(get_srv_ip "$CIDR" "$IP_NUMBER")"
 					;;
 				f*)
 					SRV_IP="$(get_srv_addr "$SRV_ADDRESS")"

@@ -36,13 +36,13 @@ usage(){
 	    "           -f            : force (create interface if the COMMAND require it)" \
 	    "           -d            : debug mode (verbose)" \
 	    "       COMMAND:" \
-	    "           CREATE                 : create interface" \
-	    "           DELETE                 : delete interface" \
-	    "           SHOW                   : show interface configuration" \
-	    "           ADDRESS|SET [CIDR|NUM] : show/set interface network address" \
-	    "           UNSET                  : remove interface address" \
-	    "           UP                     : bring interface up" \
-	    "           DOWN                   : bring interface down" \
+	    "           CREATE                   : create interface" \
+	    "           DELETE                   : delete interface" \
+	    "           SHOW                     : show interface configuration" \
+	    "           ADDRESS|SET [CIDR|(-)NUM]: show/set interface network address" \
+	    "           UNSET                    : remove interface address" \
+	    "           UP                       : bring interface up" \
+	    "           DOWN                     : bring interface down" \
             "Command names can be used in lower or upper case and abbreviated down to a single letter." \
 	    "Where there is ambiguity, dictionary order is used to select a command."
 }
@@ -107,14 +107,15 @@ EOF
 			if [ "$#" -ge 2 ] && [ "$2" ] ; then
 				shift
 				CIDR="$1"
-				if echo "$1" |grep -q "^[[:digit:]]\+$" ; then
-					IP_NUM="$1"
+				if echo "x$1" |grep -q "^x[+-]\?[[:digit:]]\+$" ; then
+					# remove beginning '+' if any
+					IP_NUM="$(echo "x$1" |sed -e "s%^x%%;s%^+%%")"
 					PCIDR="$(get_iface_cidr "$SRV_PHYS_IFACE")"
 					CIDR="$(get_srv_cidr "$PCIDR" "$IP_NUM")"
 					[ -z "$DEBUG" ] || echo "  -- IP number: [ $IP_NUM of $PCIDR ]"
 				fi
 
-				if echo "$CIDR" |grep -q "^\([[:digit:]]\+\.\)\{3\}[[:digit:]]\+/[[:digit:]]\+$" ; then
+				if echo "$CIDR" |grep -q "^\([[:digit:]]\+\.\)\{3\}[[:digit:]]\+/\-\?[[:digit:]]\+$" ; then
 					[ -z "$DEBUG" ] || echo "  --  cidr: [ $CIDR ]"
 					[ -z "$FORCE" ] || create_virt_iface "$SRV_VIRT_IFACE" "$SRV_PHYS_IFACE" 2>/dev/null
 
