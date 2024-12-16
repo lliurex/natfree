@@ -1,4 +1,4 @@
-natfree (1.3) noble; urgency=medium
+natfree (1.3) jammy; urgency=medium
 
   * Add support to dhcp method
 
