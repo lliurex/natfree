@@ -1,0 +1,13 @@
+#!/bin/bash
+
+INTERFACE=$1
+ACTION=$2
+
+case "$ACTION" in 
+	pre-up|up)
+		/usr/share/natfree-iface/natfree-iface
+		;;
+	*)
+		;;
+
+esac
