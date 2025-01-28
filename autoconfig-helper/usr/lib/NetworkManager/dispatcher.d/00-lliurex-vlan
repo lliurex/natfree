@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ "$2" = "dhcp4-change" ];then 
+
+	VALUE=$(llx-getdhcp-option lliurex_vlan)	
+	if [ ! -z "$VALUE" ];then
+		n4d-vars setvalue LLIUREX_VLAN $VALUE || true
+	fi
+
+fi
+
