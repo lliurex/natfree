@@ -1,3 +1,9 @@
+natfree (1.5) jammy; urgency=medium
+
+  * Add config to get dhcp vlan value
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Wed, 29 Jan 2025 08:23:41 +0100
+
 natfree (1.4) jammy; urgency=medium
 
   * Fix sh syntax
@@ -21,7 +27,6 @@ natfree (1.1) jammy; urgency=medium
   * Added support for negative IP arithmetic
 
  -- Luis Garcia Gisbert <luisgg@gmail.com>  Sun, 27 Oct 2024 18:26:16 +0100
->>>>>>> 034af6dc6d9c5bde7ccf9043bceffb0abb238ffe
 
 natfree (1.0) jammy; urgency=medium
 
