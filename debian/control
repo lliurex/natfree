@@ -56,4 +56,8 @@ Description:  Swiss army tool to manage natfree virtual interface.
  The natfree suite can be used to configure servers and
  workstations without the need for specific DNS or DHCP settings.
 
-
+Package: natfree-dhcp-autoconfig
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, n4d
+Description: Set into n4d servers vlan get by gva DHCP
+ Get 126 option from DHCP, set lliurex_vlan name and store into n4d
