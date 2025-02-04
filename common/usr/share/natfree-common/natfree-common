@@ -6,6 +6,7 @@
 # # and default interface name
 
 CFG_DIR="/etc/natfree.d"
+HOOKS_BASEDIR="/usr/lib/natfree"
 
 #############
 # functions #
@@ -100,13 +101,17 @@ test_virt_iface(){
 down_virt_iface(){
 	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
         test_iface "$VIRTUAL_IFACE" || die "Virtual interface not created"
+	run_hooks "pre-down" "$VIRTUAL_IFACE" $(show_addr_virt_iface "$VIRTUAL_IFACE")
 	ip link set "$VIRTUAL_IFACE" down
+	run_hooks "post-down" "$VIRTUAL_IFACE" $(show_addr_virt_iface "$VIRTUAL_IFACE")
 }
 
 up_virt_iface(){
 	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
         test_iface "$VIRTUAL_IFACE" || die "Virtual interface not created"
+	run_hooks "pre-up" "$VIRTUAL_IFACE" $(show_addr_virt_iface "$VIRTUAL_IFACE")
 	ip link set "$VIRTUAL_IFACE" up
+	run_hooks "post-up" "$VIRTUAL_IFACE" $(show_addr_virt_iface "$VIRTUAL_IFACE")
 }
 
 unset_virt_iface(){
@@ -291,6 +296,34 @@ get_srv_ip(){
 	CIDR="$1" 	# IP/MASK
 	IP_NUMBER="$2"  # -> subnet IP position
 	get_srv_cidr "$CIDR" "$IP_NUMBER" |sed -e "s%/.*$%%"
+}
+
+run_hooks(){
+	# Prepare environment and run hooks scripts
+	# in a similar way to run-parts. Execution bit is required for hooks scripts 
+	# ENVIRONMENT VARIABLES:
+	# 	NATFREE_HOOK    : Name of the hook (pre-up, post-up, pre-down, post-dow)
+	# 	NATFREE_IFACE   : Name of natfree interface
+	# 	NATFREE_ADDRESS : CIDR (IP/MASK) space separated list of natfree addresses (if any)
+	#
+	# parameters:
+	NATFREE_HOOK="$1"
+	shift
+	NATFREE_IFACE="$1"
+	shift
+	NATFREE_ADDRESS="$@"
+	export NATFREE_HOOK NATFREE_IFACE NATFREE_ADDRESS
+	HOOKS_DIR="${HOOKS_BASEDIR}/${NATFREE_HOOK}.d"
+	if [ -d "$HOOKS_DIR" ] ; then
+		for f in $(ls -1 "$HOOKS_DIR" |sort) ; do
+			HOOK_FILE="${HOOKS_DIR}/${f}"
+			if [ -x "$HOOK_FILE" ] ; then
+				$HOOK_FILE || true
+			fi
+		done
+	fi
+	unset NATFREE_HOOK NATFREE_IFACE NATFREE_ADDRESS
+	return 0
 }
 
 print_host(){
