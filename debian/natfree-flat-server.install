@@ -1,2 +1,2 @@
 server/bin/*	/usr/bin
-
+server/share/*  /usr/share/natfree-server
