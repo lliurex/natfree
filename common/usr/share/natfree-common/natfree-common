@@ -141,6 +141,8 @@ show_virt_iface(){
 
 show_addr_virt_iface(){
 	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
+	[ "$VIRTUAL_IFACE" ] || return 0
+	test_iface "$VIRTUAL_IFACE" || return 0
 	LANG=C ip a show dev "$VIRTUAL_IFACE" |sed -ne  "/^[[:blank:]]*inet[[:blank:]]/{s%^[[:blank:]]*%%;p}" |cut -d " " -f2
 }
 
@@ -151,7 +153,9 @@ create_virt_iface(){
 	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
 	PHYSICAL_IFACE="$(get_phys_iface "$2")"	# -> PHYS_IFACE
 
+	run_hooks "pre-create" "$VIRTUAL_IFACE" ""
 	ip link add "$VIRTUAL_IFACE" link "$PHYSICAL_IFACE" type macvlan mode bridge
+	run_hooks "post-create" "$VIRTUAL_IFACE" $(show_addr_virt_iface "$VIRTUAL_IFACE")
 }
 
 delete_virt_iface(){
@@ -302,7 +306,7 @@ run_hooks(){
 	# Prepare environment and run hooks scripts
 	# in a similar way to run-parts. Execution bit is required for hooks scripts 
 	# ENVIRONMENT VARIABLES:
-	# 	NATFREE_HOOK    : Name of the hook (pre-up, post-up, pre-down, post-dow)
+	# 	NATFREE_HOOK    : Name of the hook (pre-up, post-up, pre-down, post-dow, pre-create, post-create)
 	# 	NATFREE_IFACE   : Name of natfree interface
 	# 	NATFREE_ADDRESS : CIDR (IP/MASK) space separated list of natfree addresses (if any)
 	#
