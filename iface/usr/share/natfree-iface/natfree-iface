@@ -33,10 +33,5 @@ GW_IFACE="$(get_gw_iface)"
 # create interface
 natfree-iface -i "$GW_IFACE" create
 
-if type natfree-server >/dev/null 2>/devnull ; then
-#	do full automatic settings if natfree-update is installed
-	natfree-server configure
-fi
-
 exit 0
 
