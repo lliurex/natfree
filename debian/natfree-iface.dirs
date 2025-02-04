@@ -2,3 +2,5 @@
 /usr/lib/natfree/post-up.d
 /usr/lib/natfree/pre-down.d
 /usr/lib/natfree/post-down.d
+/usr/lib/natfree/pre-create.d
+/usr/lib/natfree/post-create.d
