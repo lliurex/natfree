@@ -1,12 +1,13 @@
 natfree (1.6) jammy; urgency=medium
 
   * Change default IP number to 15th
+  * Added hooks for pre-up, post-up, pre-down and post-down in natfree-iface.
   * Binary package natfree-server has been removed and replaced by:
     natfree-flat-server (uses default configuration to set IP address
     to natfree interface on start) and natfree-flex-server (no IP
     configuration by default). The intended use for flat-server is a computer
     lab with a dedicate VLAN whereas flex-server would be used in regular
-    classroom to temporary comunication with a portable laptop trolley.
+    classroom to temporary comunication with a portable laptops trolley.
   * In a similar manner, natfree-client has been splited into
     natfree-flat-client, for(computer lab clients, searching for server in the
     same lan, and  natfree-flex-client for use in portable laptops trolleys,
@@ -14,7 +15,10 @@ natfree (1.6) jammy; urgency=medium
     network address/mask. 
     configuration by default). The intended use for flat-server is a computer
     lab with a dedicate VLAN whereas flex-server would be used in regular
-    classroom to temporary comunication with a portable laptop trolley.
+    classroom to temporary comunication with laptops or a set of computers in
+    a different network.
+  * Added hook scripts in server packages to configure DNS resolution using
+    update-hosts tool.
 
  -- Luis Garcia Gisbert <luisgg@gmail.com>  Tue, 04 Feb 2025 12:45:35 +0100
 
