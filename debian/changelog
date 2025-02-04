@@ -1,7 +1,8 @@
 natfree (1.6) jammy; urgency=medium
 
   * Change default IP number to 15th
-  * Added hooks for pre-up, post-up, pre-down and post-down in natfree-iface.
+  * Added hooks for pre-up, post-up, pre-down, post-down, pre-create
+    and post-create in natfree-iface.
   * Binary package natfree-server has been removed and replaced by:
     natfree-flat-server (uses default configuration to set IP address
     to natfree interface on start) and natfree-flex-server (no IP
