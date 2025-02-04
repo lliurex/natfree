@@ -30,14 +30,28 @@ Description: natfree client tool
  The natfree suite can be used to configure servers and
  workstations without the need for specific DNS or DHCP settings.
 
-Package: natfree-server
+Package: natfree-flat-server
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), natfree-iface (= ${binary:Version})
-Description: natfree server tool
+Description: natfree server package for computer lab (dedicated VLAN)
  The natfree-server uses "natfree-iface" tool to create a
  natfree virtual interface and configures it (using  previously
  agreed ip arithmetic) when network interface brings up. The package
  also provides the "natfree-server" cli for further adjustments.
+ The default values of the parameters are obtained sourcing the files
+ (with extension .cfg) from the /etc/natfree-d directory.
+ .
+ The natfree suite can be used to configure servers and
+ workstations without the need for specific DNS or DHCP settings.
+
+Package: natfree-flex-server
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), natfree-iface (= ${binary:Version})
+Description: natfree server package for portable laptops trolley
+ The natfree-server uses "natfree-iface" tool to create a
+ natfree virtual interface. No default IP address is provided, so
+ configuration of the natfree interface requires user intervention.
+ The package also includes the "natfree-server" cli for further adjustments.
  The default values of the parameters are obtained sourcing the files
  (with extension .cfg) from the /etc/natfree-d directory.
  .
