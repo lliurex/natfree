@@ -91,6 +91,7 @@ EOF
 			if [ "$1" ] ; then
 				CIDR_NUM="$1"
 			fi
+			[ "$CIDR_NUM" ] || usage
                         [ -z "$DEBUG" ] || echo "  -- parameters: [ $CIDR_NUM ]"
 			natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" ADDRESS "$CIDR_NUM"
 
