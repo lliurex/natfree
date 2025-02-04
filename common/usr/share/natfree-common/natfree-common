@@ -334,6 +334,24 @@ print_host(){
 	printf "${IP}\t${H}\n"
 }
 
+delete_hosts_file(){
+	HOSTS_BASE_FILE="$1"
+	HOSTS_FILE="/etc/hosts.d/${HOSTS_BASE_FILE}.hosts"
+	rm -f "$HOSTS_FILE"
+}
+
+write_hosts_file(){
+	# the first parameter is the base name of the file to generate without extension
+	# second parameter is in the form 
+	# IP:alias_list_comma_separated[:optional_domain_name_list]
+	HOSTS_BASE_FILE="$1"
+	shift
+	HOSTS_FILE="/etc/hosts.d/${HOSTS_BASE_FILE}.hosts"
+        echo "# BEGIN ${HOSTS_BASE_FILE} IPs" > "$HOSTS_FILE"
+        generate_hosts "$1" >> "$HOSTS_FILE"
+        echo "# END ${HOSTS_BASE_FILE} IPs" >> "$HOSTS_FILE"
+}
+
 generate_hosts(){
 	# prints list of pairs "IP hostname" in etc/hosts format
 	# the function can receive many parameters in the form:
@@ -343,7 +361,7 @@ generate_hosts(){
 		DOMAIN_LIST=""
 		IP="${1%%:*}"
 		ALIAS_LIST="${1#*:}"
-		if echo "$ALIAS" | grep -q ":" ; then
+		if echo "$ALIAS_LIST" | grep -q ":" ; then
 			DOMAIN_LIST="${ALIAS_LIST#*:}"
 			ALIAS_LIST="${ALIAS_LIST%:*}"
 		fi

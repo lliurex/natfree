@@ -12,7 +12,7 @@
 # global vars #
 ###############
 # hosts file to write 
-HOSTS_FILE="/etc/hosts.d/arithmetic-server.hosts"
+HOSTS_BASE_FILE="natfree-client"
 DEBUG=""
 ACTION=""
 
@@ -156,7 +156,7 @@ EOF
 			done
 			[ "$OK" ] || usage
                         [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
-			rm -f "$HOSTS_FILE"
+			delete_hosts_file "$HOSTS_BASE_FILE"
 			update-hosts
 			;;
 		C*|S*|U*)
@@ -183,7 +183,7 @@ EOF
 						CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
 					fi
 					# get ip/mask in CIDR notation
-					[ "$CIDR" ] || die "Unable to retrieve IP address from $CLIENT_IFACE"
+					[ "$CIDR" ] || die "Unable to retrieve IP address from $CLIENT_MODE"
 					# get IP_NUMBER available ip in subnet
 					SRV_IP="$(get_srv_ip "$CIDR" "$IP_NUMBER")"
 					;;
@@ -203,9 +203,7 @@ EOF
                         [ -z "$DEBUG" ] || echo "  -- Server IP: [ $SRV_IP ]"
 
 		        # generate .hosts file
-		        echo "# BEGIN arithmetic-server IPs" > "$HOSTS_FILE"
-		        generate_hosts "${SRV_IP}:${SRV_ALIASES}${SEARCH_DOMAIN}" >> "$HOSTS_FILE"
-		        echo "# END arithmetic-server IPs" >> "$HOSTS_FILE"
+			write_hosts_file "$HOSTS_BASE_FILE" "${SRV_IP}:${SRV_ALIASES}${SEARCH_DOMAIN}"
 
 		        # update /etc/hosts
 		        update-hosts

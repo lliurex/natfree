@@ -1,0 +1,41 @@
+#!/bin/sh
+
+#  Description:
+#
+# natfree server tool to configure /etc/hosts with server configuration
+
+# check environment
+[ "$NATFREE_ADDRESS" ] || exit 0
+[ "$NATFREE_HOOK" ] || exit 0
+
+# hosts file to write 
+HOSTS_BASE_FILE="natfree-server"
+
+# load common functions
+. /usr/share/natfree-common/natfree-common
+
+case "$NATFREE_HOOK" in
+	post-up)
+		# List of servers aliases to write (comma separated)
+		# TODO: revise list ...
+		SRV_ALIASES="$(get_srv_aliases)"
+		SEARCH_DOMAIN="$(get_domain)"
+		[ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
+
+		# generate .hosts file
+		write_hosts_file "$HOSTS_BASE_FILE" "${NATFREE_ADDRESS}:${SRV_ALIASES}${SEARCH_DOMAIN}"
+		;;
+
+	post-down)
+		delete_hosts_file "$HOSTS_BASE_FILE"
+		;;
+	*)
+		exit 0
+		;;
+esac
+
+# update /etc/hosts
+update-hosts
+
+exit 0
+
