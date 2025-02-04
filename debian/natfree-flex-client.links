@@ -1,1 +1,3 @@
 /usr/share/natfree-client/natfree-client	/etc/network/if-up.d/natfree-client
+/usr/share/natfree-client/05-flex-client.cfg   /etc/natfree.d/05-flex-client.cfg
+
