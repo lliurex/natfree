@@ -7,6 +7,14 @@ natfree (1.6) jammy; urgency=medium
     configuration by default). The intended use for flat-server is a computer
     lab with a dedicate VLAN whereas flex-server would be used in regular
     classroom to temporary comunication with a portable laptop trolley.
+  * In a similar manner, natfree-client has been splited into
+    natfree-flat-client, for(computer lab clients, searching for server in the
+    same lan, and  natfree-flex-client for use in portable laptops trolleys,
+    the default flex configuration uses DHCP option 126 to get the server
+    network address/mask. 
+    configuration by default). The intended use for flat-server is a computer
+    lab with a dedicate VLAN whereas flex-server would be used in regular
+    classroom to temporary comunication with a portable laptop trolley.
 
  -- Luis Garcia Gisbert <luisgg@gmail.com>  Tue, 04 Feb 2025 12:45:35 +0100
 
