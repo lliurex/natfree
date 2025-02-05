@@ -1,3 +1,10 @@
+natfree (1.8) jammy; urgency=medium
+
+  * Minor fix in server-update-hosts-hook to remove hosts information when
+    natfree interface brings down.
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Wed, 05 Feb 2025 23:11:02 +0100
+
 natfree (1.7) jammy; urgency=medium
 
   * Updated server-update-hosts-hook (remove network mask to get server IP) to
