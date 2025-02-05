@@ -20,10 +20,12 @@ case "$NATFREE_HOOK" in
 		# TODO: revise list ...
 		SRV_ALIASES="$(get_srv_aliases)"
 		SEARCH_DOMAIN="$(get_domain)"
+		# remove network mask to get server IP
+		SRV_IP="${NATFREE_ADDRESS%%/*}"
 		[ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
 
 		# generate .hosts file
-		write_hosts_file "$HOSTS_BASE_FILE" "${NATFREE_ADDRESS}:${SRV_ALIASES}${SEARCH_DOMAIN}"
+		write_hosts_file "$HOSTS_BASE_FILE" "${SRV_IP}:${SRV_ALIASES}${SEARCH_DOMAIN}"
 		;;
 
 	post-down)
