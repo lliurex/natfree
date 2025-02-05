@@ -1,3 +1,11 @@
+natfree (1.7) jammy; urgency=medium
+
+  * Updated server-update-hosts-hook (remove network mask to get server IP) to
+    fix an unacceptable bug that prevented DNS resolution of ‘server’ on the
+    server itself to avoid Hector's punishment.
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Wed, 05 Feb 2025 21:24:26 +0100
+
 natfree (1.6) jammy; urgency=medium
 
   * Change default IP number to 15th
