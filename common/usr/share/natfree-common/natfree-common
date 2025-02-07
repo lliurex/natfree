@@ -75,6 +75,7 @@ get_phys_iface(){
 }
 
 get_ip_number(){
+
 	IP0="$(echo "$1" |sed -e "s%^+%%")"
 	get_var_value "$IP0" "$NF_DEF_IP_NUMBER"
 }
@@ -299,7 +300,15 @@ get_srv_ip(){
 	# parameters:
 	CIDR="$1" 	# IP/MASK
 	IP_NUMBER="$2"  # -> subnet IP position
-	get_srv_cidr "$CIDR" "$IP_NUMBER" |sed -e "s%/.*$%%"
+	get_srv_cidr "$CIDR" "$IP_NUMBER" |sed -e "s%/.*$%%" 
+}
+
+get_srv_cart_ip(){
+	CIDR="$1"
+	CART_N="$2" # CONTROLLED_CLASSROOM
+	# TODO custom ip
+	I=$(( $NF_DEF_IP_NUMBER - $CART_N ))
+	get_srv_cidr "$CIDR" "$I" |sed -e "s%/.*$%%" 
 }
 
 run_hooks(){

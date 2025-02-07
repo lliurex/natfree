@@ -176,6 +176,16 @@ EOF
 			[ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
 
 			case "$CLIENT_MODE" in
+				a*)
+					CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)
+					if [ "x$CIDR" = "x" ]; then
+						CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
+					fi
+					N_CART=$(n4d-vars getvalues CONTROLLED_CLASSROOM | cut -d "=" -f 2 | tail -c +2 | head -c -2)
+					if [ -z "$N_CART" ]; then
+						N_CART="0"
+					fi
+					SRV_IP="$(get_srv_cart_ip "$CIDR" "$N_CART")"
 				i*|d*)
 					if [ `expr $CLIENT_MODE : '^d.*'` -gt 0 ]; then
 						CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)
