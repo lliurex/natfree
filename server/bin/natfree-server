@@ -9,6 +9,7 @@
 
 SRV_PHYS_IFACE="$(get_phys_iface)"
 SRV_VIRT_IFACE="$(get_virt_iface)"
+N_CART=0
 IP_NUMBER="$(get_ip_number)"
 
 
@@ -19,13 +20,13 @@ IP_NUMBER="$(get_ip_number)"
 usage(){
         die "Usage" "$(basename "$0") [ OPTIONS ] COMMAND"  \
             "       OPTIONS:" \
-            "           -i PHYS_IFACE : physical interface name (defaults to $SRV_PHYS_IFACE)" \
-            "           -v VIRT_IFACE : virtual interface name (defaults to $SRV_VIRT_IFACE)" \
+            "           -i PHYS_IFACE 		: physical interface name (defaults to $SRV_PHYS_IFACE)" \
+            "           -v VIRT_IFACE 		: virtual interface name (defaults to $SRV_VIRT_IFACE)" \
             "           -d            : debug mode (verbose)" \
             "       COMMAND:" \
-            "           CONFIGURE|SET|UPDATE [CIDR|NUM]: configure interface virtual" \
-            "           UNCONFIGURE|UNSET              : remove configuration from virtual interface" \
-            "           SHOW|STATUS                    : show interface configuration" \
+            "           CONFIGURE|SET|UPDATE [CIDR|NUM|CART]: configure interface virtual" \
+            "           UNCONFIGURE|UNSET                   : remove configuration from virtual interface" \
+            "           SHOW|STATUS                         : show interface configuration" \
             "Command names can be used in lower or upper case and abbreviated down to a single letter." \
             "Where there is ambiguity, dictionary order is used to select a command."
 }
@@ -87,12 +88,15 @@ EOF
 			[ "$OK" ] || usage
                         [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
 			shift
-			CIDR_NUM="$IP_NUMBER"
+			INTERFACE_IP="$(get_iface_cidr $SRV_PHYS_IFACE)"
+			CIDR="$(get_network_cidr "$INTERFACE_IP")"
 			if [ "$1" ] ; then
-				CIDR_NUM="$1"
+				N_CART="$1"
 			fi
-			[ "$CIDR_NUM" ] || usage
-                        [ -z "$DEBUG" ] || echo "  -- parameters: [ $CIDR_NUM ]"
+			[ "$N_CART" ] || usage
+                        [ -z "$DEBUG" ] || echo "  -- parameters: [ $N_CART ]"
+
+			CIDR_NUM="$(get_srv_cart_ip "$CIDR" "$N_CART")"
 			natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" ADDRESS "$CIDR_NUM"
 
 			# update server n4d variables
