@@ -303,6 +303,19 @@ get_srv_ip(){
 	get_srv_cidr "$CIDR" "$IP_NUMBER" |sed -e "s%/.*$%%" 
 }
 
+get_network_cidr(){
+	CIDR="$1"
+	# separate IP / MASK & calculate HOST_NUMBITS
+	IP="${CIDR%/*}"
+	MASK="${CIDR#*/}"
+	HOST_NUMBITS=$((32 - $MASK))
+	
+	BIN_IP="$(ip2bin "$IP")"
+	BIN_NET="$(get_firstbits "$BIN_IP" "$MASK")"
+	BIN_HOSTS="$(printf "%0${HOST_NUMBITS}d")"
+	printf "$(bin2ip "$BIN_NET$BIN_HOSTS")\n"
+}
+
 get_srv_cart_ip(){
 	CIDR="$1"
 	CART_N="$2" # CONTROLLED_CLASSROOM
