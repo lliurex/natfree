@@ -44,7 +44,8 @@ usage(){
 	    "              -m f[ixed]   [FIXED_ADDRESS]: use provided IP for server address, no arithmetic." \
 	    "                                            (defaults to $SRV_ADDRESS)" \
 	    "              -m d[hcp]                   : use dhcp to determine server network and use IP arithmetic" \
-	    "                                            (NOT implemented yet)"  \
+	    "              -m a[uto]                   : auto try set config firstly by dhcp, if this fail set config " \
+	    "						 from default interface with internet connection"\
             "       COMMAND:" \
             "           CONFIGURE|SET|UPDATE : update /etc/hosts file" \
             "           DESTROY|DELETE       : remove data from /etc/hosts file" \
@@ -110,7 +111,10 @@ main(){
 					d*)	
 						OPTION="dhcp"
 						echo "$OPTION" | grep -q "^$CLIENT_MODE" || usage
-						;;	
+						;;
+					a*)
+						OPTION="auto"
+						echo "$OPTION" | grep -q "^CLIENT_MODE" || usage
 					*)
 						usage
 						;;
