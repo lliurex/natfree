@@ -16,6 +16,23 @@ Description: natfree common files
  The natfree suite can be used to configure servers and
  workstations without the need for specific DNS or DHCP settings.
 
+Package: natfree-client
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), update-hosts
+Provides: natfree-client
+Conflicts: natfree-flex-client
+Description: natfree client tool for computer lab
+ The configuration included in this package uses default
+ network connection and previously agreed ip arithmetic
+ to configure /etc/hosts using "update-host" tool in order to
+ discover services when network interface brings up. The package
+ also provides the "natfree-client" cli for further adjustments.
+ The default values of the parameters are obtained sourcing the files
+ (with extension .cfg) from the /etc/natfree-d directory.
+ .
+ The natfree suite can be used to configure servers and
+ workstations without the need for specific DNS or DHCP settings.
+
 Package: natfree-flat-client
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), update-hosts
