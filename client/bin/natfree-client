@@ -44,7 +44,8 @@ usage(){
 	    "              -m f[ixed]   [FIXED_ADDRESS]: use provided IP for server address, no arithmetic." \
 	    "                                            (defaults to $SRV_ADDRESS)" \
 	    "              -m d[hcp]                   : use dhcp to determine server network and use IP arithmetic" \
-	    "                                            (NOT implemented yet)"  \
+	    "              -m a[uto]                   : auto try set config firstly by dhcp, if this fail set config " \
+	    "						 from default interface with internet connection"\
             "       COMMAND:" \
             "           CONFIGURE|SET|UPDATE : update /etc/hosts file" \
             "           DESTROY|DELETE       : remove data from /etc/hosts file" \
@@ -110,7 +111,10 @@ main(){
 					d*)	
 						OPTION="dhcp"
 						echo "$OPTION" | grep -q "^$CLIENT_MODE" || usage
-						;;	
+						;;
+					a*)
+						OPTION="auto"
+						echo "$OPTION" | grep -q "^CLIENT_MODE" || usage
 					*)
 						usage
 						;;
@@ -176,6 +180,16 @@ EOF
 			[ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
 
 			case "$CLIENT_MODE" in
+				a*)
+					CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)
+					if [ "x$CIDR" = "x" ]; then
+						CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
+					fi
+					N_CART=$(n4d-vars getvalues CONTROLLED_CLASSROOM | cut -d "=" -f 2 | tail -c +2 | head -c -2)
+					if [ -z "$N_CART" ]; then
+						N_CART="0"
+					fi
+					SRV_IP="$(get_srv_cart_ip "$CIDR" "$N_CART")"
 				i*|d*)
 					if [ `expr $CLIENT_MODE : '^d.*'` -gt 0 ]; then
 						CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)
