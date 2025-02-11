@@ -1,4 +1,4 @@
-natfree (1.9) noble; urgency=medium
+natfree (1.9) jammy; urgency=medium
 
   * Add auto method for client
   * Server configure with classroom identifier 
