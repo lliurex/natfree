@@ -115,6 +115,7 @@ main(){
 					a*)
 						OPTION="auto"
 						echo "$OPTION" | grep -q "^CLIENT_MODE" || usage
+						;;
 					*)
 						usage
 						;;
@@ -190,6 +191,7 @@ EOF
 						N_CART="0"
 					fi
 					SRV_IP="$(get_srv_cart_ip "$CIDR" "$N_CART")"
+					;;
 				i*|d*)
 					if [ `expr $CLIENT_MODE : '^d.*'` -gt 0 ]; then
 						CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)

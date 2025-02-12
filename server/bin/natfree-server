@@ -95,9 +95,9 @@ EOF
 			fi
 			[ "$N_CART" ] || usage
                         [ -z "$DEBUG" ] || echo "  -- parameters: [ $N_CART ]"
-
+			MASK="${CIDR#*/}"
 			CIDR_NUM="$(get_srv_cart_ip "$CIDR" "$N_CART")"
-			natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" ADDRESS "$CIDR_NUM"
+			natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" ADDRESS "$CIDR_NUM/$MASK"
 
 			# update server n4d variables
 			# extract SRV_IP

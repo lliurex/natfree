@@ -313,7 +313,7 @@ get_network_cidr(){
 	BIN_IP="$(ip2bin "$IP")"
 	BIN_NET="$(get_firstbits "$BIN_IP" "$MASK")"
 	BIN_HOSTS="$(printf "%0${HOST_NUMBITS}d")"
-	printf "$(bin2ip "$BIN_NET$BIN_HOSTS")\n"
+	printf "$(bin2ip "$BIN_NET$BIN_HOSTS")/$MASK\n"
 }
 
 get_srv_cart_ip(){
