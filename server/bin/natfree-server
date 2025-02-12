@@ -105,22 +105,11 @@ EOF
 			SRV_IP="${SRV_CIDR%/*}"
 
 			# TODO: please avoid this dirty trick ...
-			# BEGIN 
-			N4DVARS_DIR="/var/lib/n4d/variables"
-			N4DVARS_FILES="SRV_IP,$SRV_IP CLIENT_LDAP_URI,ldaps://$SRV_IP CLIENT_LDAP_URI_NOSSL,ldap://$SRV_IP"
-			N4DVARS_BACKUP_DIR="/tmp/n4dvars-backup/$(date "+%s")"
-			mkdir -p "$N4DVARS_BACKUP_DIR"
-			for f in $N4DVARS_FILES ; do
-				VAR_FILE="${N4DVARS_DIR}/${f%,*}"
-				VAR_VALUE="${f#*,}"
-				if [ -e "$VAR_FILE" ] ; then
-					# make a copy
-					BASENAME_FILE="$(basename "$VAR_FILE")"
-					cp "$VAR_FILE" "$N4DVARS_BACKUP_DIR/${BASENAME_FILE}"
-					sed -i -e "/\"value\":/s%:.*$%: \"$VAR_VALUE\",%" "$VAR_FILE"
-				fi
-			done
-			service n4d restart
+			# BEGIN
+
+			n4d-vars setvalue "SRV_IP" "$SRV_IP"
+			n4d-vars setvalue "CLIENT_LDAP_URI" "ldaps://$SRV_IP"
+			n4d-vars setvalue "CLIENT_LDAP_URI_NOSSL" "ldap://$SRV_IP"
 			# END
 
 			;;
