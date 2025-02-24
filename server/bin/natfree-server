@@ -96,7 +96,9 @@ EOF
 			[ "$N_CART" ] || usage
                         [ -z "$DEBUG" ] || echo "  -- parameters: [ $N_CART ]"
 			MASK="${CIDR#*/}"
-			CIDR_NUM="$(get_srv_cart_ip "$CIDR" "$N_CART")"
+			CIDR_NUM="$(get_srv_cart_ip "$CIDR" "$N_CART" $IP_NUMBER)"
+			[ ! -z "$CIDR_NUM" ] || die "Error on get ip from interface"
+			[ ! -z "$MASK" ] || die "Error. Mask value from interface is wrong"
 			natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" ADDRESS "$CIDR_NUM/$MASK"
 
 			# update server n4d variables
@@ -104,7 +106,6 @@ EOF
 			SRV_CIDR="$(get_iface_cidr "$SRV_VIRT_IFACE")"
 			SRV_IP="${SRV_CIDR%/*}"
 
-			# TODO: please avoid this dirty trick ...
 			# BEGIN
 
 			n4d-vars setvalue "SRV_IP" "$SRV_IP"
