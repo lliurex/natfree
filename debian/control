@@ -8,7 +8,7 @@ Homepage: https://github.com/lliurex/natfree
 
 Package: natfree-common
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, update-hosts, n4d, natfree-dhcp-autoconfig (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, update-hosts, n4d (>= 0.1953), natfree-dhcp-autoconfig (= ${binary:Version})
 Description: natfree common files
  The natfree package is a suite of tools to auto discover services
  in hostile network environments managed by third parties.
@@ -18,7 +18,7 @@ Description: natfree common files
 
 Package: natfree-client
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), update-hosts
+Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), update-hosts 
 Provides: natfree-client
 Conflicts: natfree-flex-client
 Description: natfree client tool for computer lab
