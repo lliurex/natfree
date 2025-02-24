@@ -1,3 +1,9 @@
+natfree (2.3) jammy; urgency=medium
+
+  * Check variables to avoid mistakes
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 24 Feb 2025 18:48:06 +0100
+
 natfree (2.2) jammy; urgency=medium
 
   * Delete n4d vars hack
