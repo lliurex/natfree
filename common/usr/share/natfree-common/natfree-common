@@ -149,13 +149,21 @@ show_addr_virt_iface(){
 
 create_virt_iface(){
 	# create virtual interface over physical interface
-	# currently supports only macvtap mode bridge
+	# currently supports macvtap mode bridge for ethernet and
+	# mac80211 Multiple Virtual Interface (vif) for WiFi interfaces
 	# parameters:
 	VIRTUAL_IFACE="$(get_virt_iface "$1")"	# -> VIRT_IFACE_NAME
 	PHYSICAL_IFACE="$(get_phys_iface "$2")"	# -> PHYS_IFACE
 
 	run_hooks "pre-create" "$VIRTUAL_IFACE" ""
-	ip link add "$VIRTUAL_IFACE" link "$PHYSICAL_IFACE" type macvlan mode bridge
+	if [ -e "/sys/class/net/$PHYSICAL_IFACE/wireless" ] ; then
+		# wireless mode. Use mac80211 vif
+		iw dev "$PHYSICAL_IFACE" interface add "$VIRTUAL_IFACE" type station
+	else
+		# wired connection. Use macvlan 
+		ip link add "$VIRTUAL_IFACE" link "$PHYSICAL_IFACE" type macvlan mode bridge
+	fi
+
 	run_hooks "post-create" "$VIRTUAL_IFACE" $(show_addr_virt_iface "$VIRTUAL_IFACE")
 }
 

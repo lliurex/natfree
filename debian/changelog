@@ -1,3 +1,10 @@
+natfree (2.4) jammy; urgency=medium
+
+  * Added support for wireless interfaces using mac80211
+    Multiple Virtual Interface (vif)
+
+ -- Luis Garcia Gisbert <luisgg@gmail.com>  Tue, 25 Feb 2025 17:17:41 +0100
+
 natfree (2.3) jammy; urgency=medium
 
   * Check variables to avoid mistakes
