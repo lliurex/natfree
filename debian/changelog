@@ -1,3 +1,9 @@
+natfree (2.5) jammy; urgency=medium
+
+  * Add utils to plasmoid cart selector 
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Wed, 26 Feb 2025 18:14:33 +0100
+
 natfree (2.4) jammy; urgency=medium
 
   * Added support for wireless interfaces using mac80211
