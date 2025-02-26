@@ -99,6 +99,9 @@ EOF
 			CIDR_NUM="$(get_srv_cart_ip "$CIDR" "$N_CART" $IP_NUMBER)"
 			[ ! -z "$CIDR_NUM" ] || die "Error on get ip from interface"
 			[ ! -z "$MASK" ] || die "Error. Mask value from interface is wrong"
+			
+			test_available_ip || die "Error. Cart is locked"
+
 			natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" ADDRESS "$CIDR_NUM/$MASK"
 
 			# update server n4d variables
@@ -107,7 +110,7 @@ EOF
 			SRV_IP="${SRV_CIDR%/*}"
 
 			# BEGIN
-
+			n4d-vars setvalue "CLASSROOM" "$N_CART"
 			n4d-vars setvalue "SRV_IP" "$SRV_IP"
 			n4d-vars setvalue "CLIENT_LDAP_URI" "ldaps://$SRV_IP"
 			n4d-vars setvalue "CLIENT_LDAP_URI_NOSSL" "ldap://$SRV_IP"
@@ -126,6 +129,12 @@ EOF
                         [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
 
 			exec natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" UNSET
+
+			n4d-vars setvalue "CLASSROOM" ""
+			n4d-vars setvalue "SRV_IP" ""
+			n4d-vars setvalue "CLIENT_LDAP_URI" ""
+			n4d-vars setvalue "CLIENT_LDAP_URI_NOSSL" ""
+
 			;;
 
 		SH*|ST*)
