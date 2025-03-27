@@ -1,3 +1,5 @@
 server/bin/*	/usr/bin
 server/share/*	/usr/share/natfree-server
 flex-server/*	/
+server/polkit/natfree-server.polkit /usr/share/polkit-1/actions/
+server/polkit/net.lliurex.natfree.natfree-server.pkla /var/lib/polkit-1/localauthority/10.vendor.d/
