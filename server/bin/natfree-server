@@ -18,138 +18,135 @@ IP_NUMBER="$(get_ip_number)"
 #############
 
 usage(){
-        die "Usage" "$(basename "$0") [ OPTIONS ] COMMAND"  \
-            "       OPTIONS:" \
-            "           -i PHYS_IFACE 		: physical interface name (defaults to $SRV_PHYS_IFACE)" \
-            "           -v VIRT_IFACE 		: virtual interface name (defaults to $SRV_VIRT_IFACE)" \
-            "           -d            : debug mode (verbose)" \
-            "       COMMAND:" \
-            "           CONFIGURE|SET|UPDATE [CIDR|NUM|CART]: configure interface virtual" \
-            "           UNCONFIGURE|UNSET                   : remove configuration from virtual interface" \
-            "           SHOW|STATUS                         : show interface configuration" \
-            "Command names can be used in lower or upper case and abbreviated down to a single letter." \
-            "Where there is ambiguity, dictionary order is used to select a command."
+  die "Usage" "$(basename "$0") [ OPTIONS ] COMMAND"  \
+      "       OPTIONS:" \
+      "           -i PHYS_IFACE 		: physical interface name (defaults to $SRV_PHYS_IFACE)" \
+      "           -v VIRT_IFACE 		: virtual interface name (defaults to $SRV_VIRT_IFACE)" \
+      "           -d            : debug mode (verbose)" \
+      "       COMMAND:" \
+      "           CONFIGURE|SET|UPDATE [CIDR|NUM|CART]: configure interface virtual" \
+      "           UNCONFIGURE|UNSET                   : remove configuration from virtual interface" \
+      "           SHOW|STATUS                         : show interface configuration" \
+      "Command names can be used in lower or upper case and abbreviated down to a single letter." \
+      "Where there is ambiguity, dictionary order is used to select a command."
 }
-
-
 
 main(){
 
 	# check parameters
 
-        [ "$1" ] || usage
-        OPTIONS=""
-        while echo "x$1" | grep -q "^x-" ; do
-                case "$1" in
-                        -v)
-                                [ "$#" -ge 3 ] || usage
-                                shift
-                                SRV_VIRT_IFACE="$(get_virt_iface "$1")"
-                                ;;
-                        -i)
-                                [ "$#" -ge 3 ] || usage
-                                shift
-                                SRV_PHYS_IFACE="$(get_phys_iface "$1")"
-                                ;;
-                        -d)
-                                DEBUG="Y"
-                                ;;
-                        *)
-                                usage
-                                ;;
-                esac
-                OPTIONS="$OPTIONS $1"
-                shift
-        done
+  [ "$1" ] || usage
+  OPTIONS=""
+  while echo "x$1" | grep -q "^x-" ; do
+    case "$1" in
+      -v)
+        [ "$#" -ge 3 ] || usage
+        shift
+        SRV_VIRT_IFACE="$(get_virt_iface "$1")"
+        ;;
+      -i)
+        [ "$#" -ge 3 ] || usage
+        shift
+        SRV_PHYS_IFACE="$(get_phys_iface "$1")"
+        ;;
+      -d)
+        DEBUG="Y"
+        ;;
+      *)
+        usage
+        ;;
+    esac
+    OPTIONS="$OPTIONS $1"
+    shift
+  done
 
-        # check commands
-        [ "$1" ] || usage
+  # check commands
+  [ "$1" ] || usage
 
-        if [ "$DEBUG" ] ; then
-                cat << EOF
+  if [ "$DEBUG" ] ; then
+          cat << EOF
 - Options selected  : [$OPTIONS ]
 - Virtual interface : [ $SRV_VIRT_IFACE ]
 - Physical interface: [ $SRV_PHYS_IFACE ]
 EOF
-        fi
+  fi
 
+  A="$(echo "$1" |tr "[:lower:]" "[:upper:]")"
 
-        A="$(echo "$1" |tr "[:lower:]" "[:upper:]")"
+  case "$A" in
+  UP*|C*|S|SE*)
+    ACTION="CONFIGURE SET UPDATE"
+    OK=""
+    for a in $ACTION ; do
+      if echo "$a" |grep -q "^$A" ; then
+        OK="Y"
+      fi
+    done
+    [ "$OK" ] || usage
+    [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+    shift
+    INTERFACE_IP="$(get_iface_cidr $SRV_PHYS_IFACE)"
+    CIDR="$(get_network_cidr "$INTERFACE_IP")"
+    if [ "$1" ] ; then
+      N_CART="$1"
+    fi
+    [ "$N_CART" ] || usage
+    [ -z "$DEBUG" ] || echo "  -- parameters: [ $N_CART ]"
+    MASK="${CIDR#*/}"
+    CIDR_NUM="$(get_srv_cart_ip "$CIDR" "$N_CART" $IP_NUMBER)"
+    [ ! -z "$CIDR_NUM" ] || die "Error on get ip from interface"
+    [ ! -z "$MASK" ] || die "Error. Mask value from interface is wrong"
+    
+    test_available_ip || die "Error. Cart is locked"
 
-        case "$A" in
-                UP*|C*|S|SE*)
-                        ACTION="CONFIGURE SET UPDATE"
-			OK=""
-                        for a in $ACTION ; do
-                                if echo "$a" |grep -q "^$A" ; then
-                                       OK="Y"
-                                fi
-                        done
-			[ "$OK" ] || usage
-                        [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
-			shift
-			INTERFACE_IP="$(get_iface_cidr $SRV_PHYS_IFACE)"
-			CIDR="$(get_network_cidr "$INTERFACE_IP")"
-			if [ "$1" ] ; then
-				N_CART="$1"
-			fi
-			[ "$N_CART" ] || usage
-                        [ -z "$DEBUG" ] || echo "  -- parameters: [ $N_CART ]"
-			MASK="${CIDR#*/}"
-			CIDR_NUM="$(get_srv_cart_ip "$CIDR" "$N_CART" $IP_NUMBER)"
-			[ ! -z "$CIDR_NUM" ] || die "Error on get ip from interface"
-			[ ! -z "$MASK" ] || die "Error. Mask value from interface is wrong"
-			
-			test_available_ip || die "Error. Cart is locked"
+    natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" ADDRESS "$CIDR_NUM/$MASK"
 
-			natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" ADDRESS "$CIDR_NUM/$MASK"
+    # update server n4d variables
+    # extract SRV_IP
+    SRV_CIDR="$(get_iface_cidr "$SRV_VIRT_IFACE")"
+    SRV_IP="${SRV_CIDR%/*}"
 
-			# update server n4d variables
-			# extract SRV_IP
-			SRV_CIDR="$(get_iface_cidr "$SRV_VIRT_IFACE")"
-			SRV_IP="${SRV_CIDR%/*}"
-
-			# BEGIN
-			n4d-vars setvalue "CLASSROOM" "$N_CART"
-			n4d-vars setvalue "SRV_IP" "$SRV_IP"
-			n4d-vars setvalue "CLIENT_LDAP_URI" "ldaps://$SRV_IP"
-			n4d-vars setvalue "CLIENT_LDAP_URI_NOSSL" "ldap://$SRV_IP"
-			# END
-
-			;;
-                U*)
-                        ACTION="UNCONFIGURE UNSET"
-			OK=""
-                        for a in $ACTION ; do
-                                if echo "$a" |grep -q "^$A" ; then
-                                       OK="Y"
-                                fi
-                        done
-			[ "$OK" ] || usage
-                        [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
-
-			exec natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" UNSET
-
-			n4d-vars setvalue "CLASSROOM" ""
-			n4d-vars setvalue "SRV_IP" ""
-			n4d-vars setvalue "CLIENT_LDAP_URI" ""
-			n4d-vars setvalue "CLIENT_LDAP_URI_NOSSL" ""
+    # BEGIN
+    n4d-vars setvalue "CLASSROOM" "$N_CART"
+    n4d-vars setvalue "SRV_IP" "$SRV_IP"
+    n4d-vars setvalue "CLIENT_LDAP_URI" "ldaps://$SRV_IP"
+    n4d-vars setvalue "CLIENT_LDAP_URI_NOSSL" "ldap://$SRV_IP"
+    # END
 
 			;;
+  U*)
+    ACTION="UNCONFIGURE UNSET"
+    OK=""
+    for a in $ACTION ; do
+      if echo "$a" |grep -q "^$A" ; then
+        OK="Y"
+      fi
+    done
+    [ "$OK" ] || usage
+    [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
 
-		SH*|ST*)
-			ACTION="STATUS SHOW"
-			OK=""
-                        for a in $ACTION ; do
-                                if echo "$a" |grep -q "^$A" ; then
-                                       OK="Y"
-                                fi
-                        done
-                        [ "$OK" ] || usage
+    exec natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" UNSET
 
-                        [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
-			exec natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" SHOW
-			;;
+    n4d-vars setvalue "CLASSROOM" ""
+    n4d-vars setvalue "SRV_IP" ""
+    n4d-vars setvalue "CLIENT_LDAP_URI" ""
+    n4d-vars setvalue "CLIENT_LDAP_URI_NOSSL" ""
+
+		;;
+
+	SH*|ST*)
+		ACTION="STATUS SHOW"
+		OK=""
+    for a in $ACTION ; do
+      if echo "$a" |grep -q "^$A" ; then
+        OK="Y"
+      fi
+    done
+    [ "$OK" ] || usage
+
+    [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+		exec natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" SHOW
+		;;
 	esac
 
 
