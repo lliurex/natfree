@@ -97,7 +97,7 @@ EOF
     [ ! -z "$CIDR_NUM" ] || die "Error on get ip from interface"
     [ ! -z "$MASK" ] || die "Error. Mask value from interface is wrong"
     
-    test_available_ip || die "Error. Cart is locked"
+    test_available_ip $CIDR_NUM || die "Error. Cart is locked"
 
     natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" ADDRESS "$CIDR_NUM/$MASK"
 

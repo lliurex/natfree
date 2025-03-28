@@ -413,8 +413,6 @@ generate_hosts(){
 test_available_ip(){
 	# Returns 0 if the IP is available or 1 if it is unreachable.
 	# Parameters:
-	IP="$1" 
-	shift
 	ping -c 1 -w 1 "$1" > /dev/null 2>&1
 	if [ $? -eq 0 ]; then
 		return 1
