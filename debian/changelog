@@ -1,3 +1,9 @@
+natfree (2.5.2) jammy; urgency=medium
+
+  * Fix bug
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Fri, 28 Mar 2025 11:35:29 +0100
+
 natfree (2.5.1) jammy; urgency=medium
 
   * Install correctly scripts
