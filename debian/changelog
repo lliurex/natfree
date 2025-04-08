@@ -1,3 +1,9 @@
+natfree (2.6.3) jammy; urgency=medium
+
+  * Install on correct path polkit action
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Tue, 08 Apr 2025 19:20:00 +0200
+
 natfree (2.6.1) jammy; urgency=medium
 
   * Fix typo on service
