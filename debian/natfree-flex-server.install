@@ -1,7 +1,7 @@
 server/bin/*	/usr/bin
 server/share/*	/usr/share/natfree-server
 flex-server/*	/
-server/polkit/net.lliurex.natfree.polkit /usr/share/polkit-1/actions/
+server/polkit/net.lliurex.natfree.policy /usr/share/polkit-1/actions/
 server/polkit/net.lliurex.natfree.natfree-server.pkla /var/lib/polkit-1/localauthority/10.vendor.d/
 service/classroom_manager.py /usr/share/n4d/python-plugins/
 service/free-classroom /usr/bin/

@@ -1,3 +1,9 @@
+natfree (2.6.6) jammy; urgency=medium
+
+  * Fix rename name
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Tue, 08 Apr 2025 20:50:55 +0200
+
 natfree (2.6.4) jammy; urgency=medium
 
   * Fix 
