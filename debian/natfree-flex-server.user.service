@@ -6,7 +6,7 @@ ConditionGroup=10003
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/bin/true
-ExecStop=/usr/bin/free_classroom
+ExecStop=/usr/bin/free-classroom
 
 [Install]
 WantedBy=default.target
