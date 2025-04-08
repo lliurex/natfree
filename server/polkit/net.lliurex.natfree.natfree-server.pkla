@@ -1,6 +1,6 @@
 [/usr/bin/natfree-server]
 Identity=unix-group:teachers;unix-group:sudo;unix-group:admins;
 Action=net.lliurex.natfree.natfree-server
-ResultActive=yes
-ResultAny=no
-ResultInactive=no
+ResultActive=self_auth
+ResultAny=self_auth
+ResultInactive=self_auth
