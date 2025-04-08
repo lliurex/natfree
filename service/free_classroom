@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+
+import os
+import n4d.client
+
+user=os.environ["USER"]
+n=n4d.client.Client("https://localhost:9779",user=user,password="")
+ret=n.create_ticket()
+cred=ret.credential
+c=n4d.client.Client("https://localhost:9779",credential=ret.credential)
+c.ClassroomManager.free_classroom()

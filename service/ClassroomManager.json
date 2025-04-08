@@ -1,0 +1,16 @@
+{
+    "SETUP": {
+        "type": "python",
+        "path": "classroom_manager.py",
+        "class": "ClassroomManager"
+    },
+    "METHODS": {
+        "free_classroom": {
+            "allowed_groups": [
+                "sudo",
+                "admins",
+		"teachers"
+            ]
+        }
+    }
+}
