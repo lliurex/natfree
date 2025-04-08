@@ -1,3 +1,9 @@
+natfree (2.6) jammy; urgency=medium
+
+  * Add scripts to release cart on flex model
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Tue, 08 Apr 2025 13:51:49 +0200
+
 natfree (2.5.2) jammy; urgency=medium
 
   * Fix bug
