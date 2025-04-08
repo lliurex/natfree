@@ -1,0 +1,12 @@
+[Unit]
+Description=Free classroom number
+ConditionGroup=10003
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/true
+ExecStop=/usr/bin/free_classroom
+
+[Install]
+WantedBy=default.target

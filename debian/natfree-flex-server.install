@@ -6,4 +6,3 @@ server/polkit/net.lliurex.natfree.natfree-server.pkla /var/lib/polkit-1/localaut
 service/classroom_manager.py /usr/share/n4d/python-plugins/
 service/free-classroom /usr/bin/
 service/ClassroomManager.json /etc/n4d/conf.d/
-service/classroom_flex.service /usr/lib/systemd/user/
