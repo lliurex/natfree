@@ -1,3 +1,9 @@
+natfree (2.7) jammy; urgency=medium
+
+  * Set number cart by default to 1
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Thu, 10 Apr 2025 14:07:34 +0200
+
 natfree (2.6.6) jammy; urgency=medium
 
   * Fix rename name
