@@ -190,7 +190,7 @@ EOF
 					fi
 					N_CART=$(n4d-vars getvalues CONTROLLED_CLASSROOM | cut -d "=" -f 2 | tail -c +2 | head -c -2)
 					if [ -z "$N_CART" ]; then
-						N_CART="0"
+						N_CART="1"
 					fi
 					SRV_IP="$(get_srv_cart_ip "$CIDR" "$N_CART" "$IP_NUMBER")"
 					;;
