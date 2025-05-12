@@ -1,3 +1,9 @@
+natfree (2.8) noble; urgency=medium
+
+  * First noble version
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 12 May 2025 13:55:58 +0200
+
 natfree (2.7) jammy; urgency=medium
 
   * Set number cart by default to 1
