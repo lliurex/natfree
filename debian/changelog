@@ -1,4 +1,4 @@
-natfree (2.9) noble; urgency=medium
+natfree (2.8-noble) noble; urgency=medium
 
   * Add patch to read iface correctly
 
