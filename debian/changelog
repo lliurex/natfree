@@ -1,3 +1,9 @@
+natfree (2.9) noble; urgency=medium
+
+  * Add patch to read iface correctly
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 12 May 2025 18:42:20 +0200
+
 natfree (2.8) noble; urgency=medium
 
   * First noble version
