@@ -1,0 +1,12 @@
+{
+	"CONTROLLED_CLASSROOM": {
+		"function": "",
+		"packages": [
+			"natfree-lab-client"
+		],
+		"volatile": false,
+		"description": "Class identifier it belongs to",
+		"value": 0 ,
+		"force_update": true
+	}
+}
