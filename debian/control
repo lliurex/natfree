@@ -16,11 +16,9 @@ Description: natfree common files
  The natfree suite can be used to configure servers and
  workstations without the need for specific DNS or DHCP settings.
 
-Package: natfree-client
+Package: natfree-alu
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), update-hosts 
-Provides: natfree-client
-Conflicts: natfree-flex-client
 Description: natfree client tool for portable laptops trolley 
  The configuration included in this package uses default
  network connection and previously agreed ip arithmetic
@@ -33,9 +31,9 @@ Description: natfree client tool for portable laptops trolley
  The natfree suite can be used to configure servers and
  workstations without the need for specific DNS or DHCP settings.
 
-Package: natfree-lab-client
+Package: natfree-lab-alu
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-client
+Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-alu
 Description: natfree client tool for computer lab
  The configuration included in this package uses default
  network connection and previously agreed ip arithmetic
