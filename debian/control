@@ -16,7 +16,7 @@ Description: natfree common files
  The natfree suite can be used to configure servers and
  workstations without the need for specific DNS or DHCP settings.
 
-Package: natfree-alu
+Package: natfree-tie
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), update-hosts 
 Description: natfree client tool for portable laptops trolley 
@@ -24,7 +24,7 @@ Description: natfree client tool for portable laptops trolley
  network connection and previously agreed ip arithmetic
  to configure /etc/hosts using "update-host" tool in order to
  discover services when network interface brings up. The package
- also provides the "natfree-client" cli for further adjustments.
+ also provides the "natfree-tie" cli for further adjustments.
  The default values of the parameters are obtained sourcing the files
  (with extension .cfg) from the /etc/natfree-d directory.
  .
@@ -33,18 +33,10 @@ Description: natfree client tool for portable laptops trolley
 
 Package: natfree-lab-alu
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-alu
-Description: natfree client tool for computer lab
- The configuration included in this package uses default
- network connection and previously agreed ip arithmetic
- to configure /etc/hosts using "update-host" tool in order to
- discover services when network interface brings up. The package
- also provides the "natfree-client" cli for further adjustments.
- The default values of the parameters are obtained sourcing the files
- (with extension .cfg) from the /etc/natfree-d directory.
- .
- The natfree suite can be used to configure servers and
- workstations without the need for specific DNS or DHCP settings.
+Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-tie
+Description: natfree configuration for computer lab
+ The configuration included CLASSROOM_CONTROLED n4d variable to configure 
+ server as first ip from range
 
 Package: natfree-flat-server
 Architecture: any
