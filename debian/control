@@ -3,7 +3,7 @@ Section: misc
 Priority: optional
 Maintainer: LliureX Team <lliurex@gva.es> 
 Standards-Version: 4.3.0
-Build-Depends: debhelper-compat (= 10)
+Build-Depends: debhelper-compat (= 10), n4d-dev
 Homepage: https://github.com/lliurex/natfree
 
 Package: natfree-common
