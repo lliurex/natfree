@@ -6,7 +6,7 @@ ACTION=$2
 
 case "$ACTION" in 
 	dhcp4-change|dhcp6-change)
-		natfree-client UPDATE
+		natfree-tie UPDATE
 		;;
 	*)
 		;;
