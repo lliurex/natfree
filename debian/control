@@ -38,11 +38,9 @@ Description: natfree configuration for computer lab
  The configuration included CLASSROOM_CONTROLED n4d variable to configure 
  server as first ip from range
 
-Package: natfree-flat-server
+Package: natfree-lab-pro
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), natfree-iface (= ${binary:Version})
-Provides: natfree-server
-Conflicts: natfree-flex-server
 Description: natfree server package for computer lab (dedicated VLAN)
  The natfree-server uses "natfree-iface" tool to create a
  natfree virtual interface and configures it (using  previously
