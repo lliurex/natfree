@@ -1,0 +1,12 @@
+#!/bin/bash
+
+INTERFACE=$1
+ACTION=$2
+
+case "$ACTION" in 
+	pre-up|up)
+		/usr/bin/natfree-server configure 0
+		;;
+	*)
+		;;
+esac
