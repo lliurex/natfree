@@ -21,7 +21,6 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), update-hosts 
 Provides: natfree-client
 Conflicts: natfree-flex-client
-Description: natfree client tool for computer lab
 Description: natfree client tool for portable laptops trolley 
  The configuration included in this package uses default
  network connection and previously agreed ip arithmetic
