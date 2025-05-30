@@ -1,3 +1,9 @@
+natfree (2.8) jammy; urgency=medium
+
+  * freenat-lab-client is added
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Fri, 30 May 2025 10:25:31 +0200
+
 natfree (2.7) jammy; urgency=medium
 
   * Set number cart by default to 1
