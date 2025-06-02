@@ -1,0 +1,3 @@
+/usr/share/natfree-adi/10-flex-adi.cfg   		/etc/natfree.d/10-flex-adi.cfg
+/usr/share/natfree-adi/adi-update-hosts-hook	/usr/lib/natfree/post-up.d/10-adi-update-hosts-hook
+/usr/share/natfree-adi/adi-update-hosts-hook	/usr/lib/natfree/post-down.d/10-adi-update-hosts-hook
