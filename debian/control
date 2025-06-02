@@ -52,7 +52,7 @@ Description: natfree server package for computer lab (dedicated VLAN)
  The natfree suite can be used to configure servers and
  workstations without the need for specific DNS or DHCP settings.
 
-Package: natfree-flex-server
+Package: natfree-adi
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), natfree-iface (= ${binary:Version})
 Provides: natfree-server
