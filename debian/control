@@ -40,7 +40,7 @@ Description: natfree configuration for computer lab
 
 Package: natfree-lab-pro
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), natfree-iface (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), natfree-iface (= ${binary:Version}), natfree-adi
 Description: natfree server package for computer lab (dedicated VLAN)
  The natfree-server uses "natfree-iface" tool to create a
  natfree virtual interface and configures it (using  previously

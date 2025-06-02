@@ -1,3 +1,9 @@
+natfree (2.9.3) jammy; urgency=medium
+
+  * Add dependency with natfree-adi 
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 02 Jun 2025 19:39:23 +0200
+
 natfree (2.9.2) jammy; urgency=medium
 
   * Add executable permissions 
