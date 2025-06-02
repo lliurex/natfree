@@ -1,6 +1,6 @@
 #!/bin/sh
 
 # do full automatic settings after iface creation (if possible)
-natfree-server configure || true
+natfree-adi configure || true
 exit 0
 

@@ -8,7 +8,7 @@
 [ "$NATFREE_HOOK" ] || exit 0
 
 # hosts file to write 
-HOSTS_BASE_FILE="natfree-server"
+HOSTS_BASE_FILE="natfree-adi"
 
 # load common functions
 . /usr/share/natfree-common/natfree-common

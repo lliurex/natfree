@@ -29,7 +29,7 @@ class ClassroomManager:
         # natfree manager things here ?
         # ret=os.system()
         
-        p = s.Popen("natfree-server unset",shell=True,stdout=s.PIPE,stderr=s.PIPE)
+        p = s.Popen("natfree-adi unset",shell=True,stdout=s.PIPE,stderr=s.PIPE)
         p.communicate()
         ret = p.returncode
         if ret==0:
