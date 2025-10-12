@@ -1,0 +1,7 @@
+adi/bin/*	/usr/bin
+adi/share/*	/usr/share/natfree-adi
+adi/polkit/net.lliurex.natfree.policy /usr/share/polkit-1/actions/
+adi/polkit/net.lliurex.natfree.natfree-adi.pkla /var/lib/polkit-1/localauthority/10.vendor.d/
+service/classroom_manager.py /usr/share/n4d/python-plugins/
+service/free-classroom /usr/bin/
+service/ClassroomManager.json /etc/n4d/conf.d/

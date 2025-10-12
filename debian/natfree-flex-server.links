@@ -1,3 +1,0 @@
-/usr/share/natfree-server/10-flex-server.cfg   		/etc/natfree.d/10-flex-server.cfg
-/usr/share/natfree-server/server-update-hosts-hook	/usr/lib/natfree/post-up.d/10-server-update-hosts-hook
-/usr/share/natfree-server/server-update-hosts-hook	/usr/lib/natfree/post-down.d/10-server-update-hosts-hook

@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 %:
-	dh $@
+	dh $@ --with n4d-vars
 
 override_dh_prep:
 	dh_prep
