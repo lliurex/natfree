@@ -23,7 +23,7 @@ main(){
 	# correct interface up?
 	[ "$GW_IFACE" = "$IFACE" ] || exit 0
 
-	natfree-client -i "$GW_IFACE" update
+	natfree-tie -i "$GW_IFACE" update
 }
 
 ################
