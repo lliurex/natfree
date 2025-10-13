@@ -70,7 +70,7 @@ Description: natfree server package for portable laptops trolley
 
 Package: natfree-iface
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), network-manager
 Description:  Swiss army tool to manage natfree virtual interface.
  The natfree-iface tool mimics in a simplified way the syntax of
  the ip command, and provides default values for most parameters
