@@ -1,3 +1,9 @@
+natfree (2.9.6) jammy; urgency=medium
+
+  * Add network-manager dependency
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 13 Oct 2025 10:14:48 +0200
+
 natfree (2.9.5) jammy; urgency=medium
 
   * Remove if-up.d script  
