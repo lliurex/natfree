@@ -25,10 +25,10 @@ GW_IFACE="$(get_gw_iface)"
 ########
 
 [ "$GW_IFACE" ] || die "Unable to find network gateway iface"
-[ "$IFACE" ] || die "Undefined 'IFACE' environment var. May be not running under networkd-dispatcher?"
+[ "$DEVICE_IFACE" ] || die "Undefined 'IFACE' environment var. May be not running under networkd-dispatcher?"
 
 # correct interface up?
-[ "$GW_IFACE" = "$IFACE" ] || exit 0
+[ "$GW_IFACE" = "$DEVICE_IFACE" ] || exit 0
 
 # create interface
 natfree-iface -i "$GW_IFACE" create
