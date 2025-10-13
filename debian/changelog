@@ -1,3 +1,9 @@
+natfree (2.9.5) jammy; urgency=medium
+
+  * Remove if-up.d script  
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 13 Oct 2025 09:14:46 +0200
+
 natfree (2.9.4) jammy; urgency=medium
 
   * Fix broken link 
