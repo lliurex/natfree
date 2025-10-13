@@ -1,3 +1,10 @@
+natfree (2.9) noble; urgency=medium
+
+  * Remove links on if-up.d
+  * Sync with new master branch
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 13 Oct 2025 09:30:23 +0200
+
 natfree (2.8-noble) noble; urgency=medium
 
   * Add patch to read iface correctly
