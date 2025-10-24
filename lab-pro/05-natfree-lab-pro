@@ -3,8 +3,15 @@
 INTERFACE=$1
 ACTION=$2
 
+. /usr/share/natfree-common/natfree-common
+
+
 case "$ACTION" in 
 	pre-up|up)
+
+		GW_IFACE="$(get_gw_iface)"
+
+		[ "$GW_IFACE" = "$INTERFACE" ] || exit 0
 		/usr/bin/natfree-adi configure 0
 		;;
 	*)
