@@ -5,7 +5,7 @@ INTERFACE=$1
 ACTION=$2
 
 case "$ACTION" in 
-	dhcp4-change|dhcp6-change)
+	up|dhcp4-change|dhcp6-change)
 		natfree-tie UPDATE
 		;;
 	*)
