@@ -1,3 +1,9 @@
+natfree (2.12) noble; urgency=medium
+
+  * reconfigure hosts when up interface 
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Fri, 24 Oct 2025 18:10:22 +0200
+
 natfree (2.11) noble; urgency=medium
 
   * natfree-tie now install CONTROLLED_CLASSROOM variable
