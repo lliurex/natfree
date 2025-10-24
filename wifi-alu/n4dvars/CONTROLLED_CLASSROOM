@@ -1,0 +1,12 @@
+{
+	"CONTROLLED_CLASSROOM": {
+		"function": "",
+		"packages": [
+			"natfree-wifi-alu-config"
+		],
+		"volatile": false,
+		"description": "Class identifier it belongs to",
+		"value": 1 ,
+		"force_update": true
+	}
+}
