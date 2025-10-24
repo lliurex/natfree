@@ -83,6 +83,6 @@ Description:  Swiss army tool to manage natfree virtual interface.
 
 Package: natfree-dhcp-autoconfig
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, n4d
+Depends: ${shlibs:Depends}, ${misc:Depends}, n4d, isc-dhcp-client
 Description: Set into n4d servers vlan get by gva DHCP
  Get 126 option from DHCP, set lliurex_vlan name and store into n4d
