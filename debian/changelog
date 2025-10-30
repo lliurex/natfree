@@ -1,3 +1,9 @@
+natfree (2.13) noble; urgency=medium
+
+  * Manage hosts names when configure with natfree-adi
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Thu, 30 Oct 2025 13:09:07 +0100
+
 natfree (2.12) noble; urgency=medium
 
   * reconfigure hosts when up interface 
