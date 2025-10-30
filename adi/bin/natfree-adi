@@ -12,6 +12,8 @@ SRV_VIRT_IFACE="$(get_virt_iface)"
 N_CART=0
 IP_NUMBER="$(get_ip_number)"
 
+HOSTS_BASE_FILE="natfree-adi"
+SRV_ALIASES="$(get_srv_aliases)"
 
 #############
 # functions #
@@ -112,6 +114,15 @@ EOF
     n4d-vars setvalue "CLIENT_LDAP_URI" "ldaps://$SRV_IP"
     n4d-vars setvalue "CLIENT_LDAP_URI_NOSSL" "ldap://$SRV_IP"
     # END
+    
+    SEARCH_DOMAIN="$(get_domain)"
+    [ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
+ 
+    # generate .hosts file
+    write_hosts_file "$HOSTS_BASE_FILE" "${SRV_IP}:${SRV_ALIASES}${SEARCH_DOMAIN}"
+
+    # update /etc/hosts
+    update-hosts
 
 			;;
   U*)
@@ -131,6 +142,9 @@ EOF
     n4d-vars setvalue "SRV_IP" ""
     n4d-vars setvalue "CLIENT_LDAP_URI" ""
     n4d-vars setvalue "CLIENT_LDAP_URI_NOSSL" ""
+
+    delete_hosts_file "$HOSTS_BASE_FILE"
+    update-hosts
 
 		;;
 
