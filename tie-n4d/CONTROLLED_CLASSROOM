@@ -2,11 +2,11 @@
 	"CONTROLLED_CLASSROOM": {
 		"function": "",
 		"packages": [
-			"natfree-lab-client"
+			"natfree-wifi-alu-config"
 		],
 		"volatile": false,
 		"description": "Class identifier it belongs to",
-		"value": 0 ,
+		"value": 1 ,
 		"force_update": true
 	}
 }
