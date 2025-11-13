@@ -1,0 +1,41 @@
+#!/bin/sh
+
+HOSTS_DIR="/etc/hosts.d"
+HOSTS_FILE="/etc/hosts"
+BEGIN_MARK="### BEGIN update-hosts section ###"
+END_MARK="### END update-hosts section ###"
+
+set -e
+
+remove_section(){
+                sed -i -e "/^$BEGIN_MARK$/,/^$END_MARK$/d" "$HOSTS_FILE"
+                }
+
+case "$1" in
+   configure)
+        #n4d-modules enable-control LliureXRemoteInstaller || true
+	if [ -d $HOSTS_DIR  ]; then
+		rm -r $HOSTS_DIR
+		echo "Deleting obsolete directory....$HOSTS_DIR"
+	fi
+	remove_section()
+	n4d-vars delete CLASSROOM || true
+	n4d-vars delete SRV_IP || true
+	n4d-vars delete CLIENT_LDAP_URI || true
+	n4d-vars delete CLIENT_LDAP_URI_NOSSL  || true
+
+
+   ;;
+
+   abort-upgrade|abort-remove|abort-deconfigure)
+   ;;
+
+   *)
+       exit 1
+   ;;
+esac
+
+#DEBHELPER#
+
+exit 0
+
