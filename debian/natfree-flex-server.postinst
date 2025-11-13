@@ -18,7 +18,7 @@ case "$1" in
 		rm -r $HOSTS_DIR
 		echo "Deleting obsolete directory....$HOSTS_DIR"
 	fi
-	remove_section()
+	remove_section
 	n4d-vars delete CLASSROOM || true
 	n4d-vars delete SRV_IP || true
 	n4d-vars delete CLIENT_LDAP_URI || true
