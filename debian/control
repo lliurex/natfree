@@ -89,7 +89,7 @@ Description: Set into n4d servers vlan get by gva DHCP
 Package: natfree-flex-server
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, n4d (>=0.1963), python3
-Conflicts: natfree-common, natfree-iface
-Breaks: natfree-common, natfree-iface
+Conflicts: natfree-common, natfree-iface, natfree-dhcp-autoconfig, update-hosts
+Breaks: natfree-common, natfree-iface, natfree-dhcp-autoconfig, update-hosts
 Description: Transitional package
  Erase empty obsolete N4D variables and remove /ETC/HOST.D directory
