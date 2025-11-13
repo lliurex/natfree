@@ -85,3 +85,10 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, n4d, isc-dhcp-client
 Description: Set into n4d servers vlan get by gva DHCP
  Get 126 option from DHCP, set lliurex_vlan name and store into n4d
+
+Package: natfree-flex-server
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, n4d (>=0.1963), python3
+Conflicts: natfree-common, natfree-iface
+Description: Transitional package
+ Erase empty obsolete N4D variables and remove /ETC/HOST.D directory
