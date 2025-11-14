@@ -138,10 +138,10 @@ EOF
 
     natfree-iface -i "$SRV_PHYS_IFACE" -v "$SRV_VIRT_IFACE" UNSET
 
-    n4d-vars setvalue "CLASSROOM" ""
-    n4d-vars setvalue "SRV_IP" ""
-    n4d-vars setvalue "CLIENT_LDAP_URI" ""
-    n4d-vars setvalue "CLIENT_LDAP_URI_NOSSL" ""
+    n4d-vars delete "CLASSROOM" ""
+    n4d-vars delete "SRV_IP" ""
+    n4d-vars delete "CLIENT_LDAP_URI" ""
+    n4d-vars delete "CLIENT_LDAP_URI_NOSSL" ""
 
     delete_hosts_file "$HOSTS_BASE_FILE"
     update-hosts
