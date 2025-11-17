@@ -1,3 +1,9 @@
+natfree (2.10) jammy; urgency=medium
+
+  * Install n4d variable
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 17 Nov 2025 14:30:32 +0100
+
 natfree (2.9.7) jammy; urgency=medium
 
   * Test
