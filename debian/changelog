@@ -1,3 +1,9 @@
+natfree (2.11) jammy; urgency=medium
+
+  * Conflict between adi and tie 
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 24 Nov 2025 12:11:34 +0100
+
 natfree (2.10) jammy; urgency=medium
 
   * Install n4d variable
