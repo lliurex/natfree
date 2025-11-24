@@ -19,6 +19,7 @@ Description: natfree common files
 Package: natfree-tie
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), update-hosts, natfree-iface (= ${binary:Version})
+Conflicts: natfree-adi
 Description: natfree client tool for portable laptops trolley 
  The configuration included in this package uses default
  network connection and previously agreed ip arithmetic
@@ -56,7 +57,7 @@ Package: natfree-adi
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), natfree-iface (= ${binary:Version})
 Provides: natfree-server
-Conflicts: natfree-flat-server
+Conflicts: natfree-flat-server, natfree-tie
 Description: natfree server package for portable laptops trolley
  The natfree-server uses "natfree-iface" tool to create a
  natfree virtual interface. No default IP address is provided, so
