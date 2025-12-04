@@ -29,6 +29,8 @@ SRV_ALIASES="$(get_srv_aliases)"
 SRV_CIDR="$(get_srv_net)"
 CLIENT_MODE="$(get_client_mode)"
 SRV_ADDRESS="$(get_srv_addr)"
+SEARCH_DOMAIN="$(get_domain)"
+[ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
 
 usage(){
         die "Usage" "$(basename "$0") [ OPTIONS ] COMMAND"  \
@@ -49,6 +51,8 @@ usage(){
             "       COMMAND:" \
             "           CONFIGURE|SET|UPDATE : update /etc/hosts file" \
             "           DESTROY|DELETE       : remove data from /etc/hosts file" \
+            "           MONIT		     : create monit configuration to sync with server" \
+            "           PUT		     : write adi file on hosts.d folder with ip and update hosts" \
             "Command and mode names can be used in lower or upper case and abbreviated down to a single letter." \
             "Where there is ambiguity, dictionary order is used to select a command."
 }
@@ -56,6 +60,56 @@ usage(){
 #############
 # functions #
 #############
+
+calculate_values(){
+	# recopile necessary data
+	# get DNS search domain from resolv.conf (if any)
+	echo $CLIENT_MODE	
+	case "$CLIENT_MODE" in
+		a*)
+			# Get values from DHCP
+			echo 1
+			CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)
+			# 
+			echo 2 
+			if [ "x$CIDR" = "x" ]; then
+				CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
+			fi
+			echo 3
+			N_CART=$(n4d-vars getvalues CONTROLLED_CLASSROOM | cut -d "=" -f 2 | tail -c +2 | head -c -2)
+			echo 4
+			if [ -z "$N_CART" ]; then
+				N_CART="1"
+			fi
+			echo 5
+			SRV_IP="$(get_srv_cart_ip "$CIDR" "$N_CART" "$IP_NUMBER")"
+			;;
+		i*|d*)
+			if [ `expr $CLIENT_MODE : '^d.*'` -gt 0 ]; then
+				CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)
+			else
+				CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
+			fi
+			# get ip/mask in CIDR notation
+			[ "$CIDR" ] || die "Unable to retrieve IP address from $CLIENT_MODE"
+			# get IP_NUMBER available ip in subnet
+			SRV_IP="$(get_srv_ip "$CIDR" "$IP_NUMBER")"
+			;;
+		n*)
+			# use provided SRV_CIDR
+			CIDR="$(get_srv_net "$SRV_CIDR")"
+			[ "$CIDR" ] || die "Invalid CIDR value"
+			# get IP_NUMBER available ip in subnet
+			SRV_IP="$(get_srv_ip "$CIDR" "$IP_NUMBER")"
+			;;
+		f*)
+			SRV_IP="$(get_srv_addr "$SRV_ADDRESS")"
+			;;
+	esac
+	echo $SRV_IP
+}
+
+
 main(){
         # check parameters
 
@@ -175,57 +229,48 @@ EOF
 			[ "$OK" ] || usage
                         [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
 
-			# recopile necessary data
-			# get DNS search domain from resolv.conf (if any)
-			SEARCH_DOMAIN="$(get_domain)"
-			[ -z "$SEARCH_DOMAIN" ] || SEARCH_DOMAIN=":${SEARCH_DOMAIN}"
-
-			case "$CLIENT_MODE" in
-				a*)
-					# Get values from DHCP
-					CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)
-					# 
-					if [ "x$CIDR" = "x" ]; then
-						CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
-					fi
-					N_CART=$(n4d-vars getvalues CONTROLLED_CLASSROOM | cut -d "=" -f 2 | tail -c +2 | head -c -2)
-					if [ -z "$N_CART" ]; then
-						N_CART="1"
-					fi
-					SRV_IP="$(get_srv_cart_ip "$CIDR" "$N_CART" "$IP_NUMBER")"
-					;;
-				i*|d*)
-					if [ `expr $CLIENT_MODE : '^d.*'` -gt 0 ]; then
-						CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)
-					else
-						CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
-					fi
-					# get ip/mask in CIDR notation
-					[ "$CIDR" ] || die "Unable to retrieve IP address from $CLIENT_MODE"
-					# get IP_NUMBER available ip in subnet
-					SRV_IP="$(get_srv_ip "$CIDR" "$IP_NUMBER")"
-					;;
-				n*)
-					# use provided SRV_CIDR
-	                                CIDR="$(get_srv_net "$SRV_CIDR")"
-					[ "$CIDR" ] || die "Invalid CIDR value"
-					# get IP_NUMBER available ip in subnet
-					SRV_IP="$(get_srv_ip "$CIDR" "$IP_NUMBER")"
-					;;
-				f*)
-					SRV_IP="$(get_srv_addr "$SRV_ADDRESS")"
-					;;
-			esac
-
+			SRV_IP=$(calculate_values)
+				
 			[ "$SRV_IP" ] || die "Invalid server IP"
                         [ -z "$DEBUG" ] || echo "  -- Server IP: [ $SRV_IP ]"
-
 		        # generate .hosts file
+
 			write_hosts_file "$HOSTS_BASE_FILE" "${SRV_IP}:${SRV_ALIASES}${SEARCH_DOMAIN}"
 
 		        # update /etc/hosts
 		        update-hosts
 			;;
+		M*)
+			ACTION="MONIT"
+			OK=""
+			for a in $ACTION; do
+				if echo $a | grep -q "^$A" ; then
+					OK="Y"
+				fi
+			done
+			[ "$OK" ] || usage
+			[ -z "$DEBUG" ] || echo "- Action: [$ACTION]"
+			SRV_IP=$(calculate_values)
+			sed -e "s%_@_WATCH_IP_@_%$SRV_IP%g" /usr/share/natfree-tie/templates/monit > /etc/monit/conf.d/adi
+			monit reload
+			;;
+		P*)
+			ACTION="PUT"
+			OK=""
+			for a in $ACTION; do
+				if echo $a | grep -q "^$A" ; then
+					OK="Y"
+				fi
+			done
+			[ "$OK" ] || usage
+			[ -z "$DEBUG" ] || echo "- Action: [$ACTION]"
+			FIXED_IP=$2
+			write_hosts_file "$HOSTS_BASE_FILE" "${FIXED_IP}:${SRV_ALIASES}${SEARCH_DOMAIN}"
+
+		        # update /etc/hosts
+		        update-hosts
+
+			;;			
 		*)
 			usage
 			;;
@@ -236,6 +281,8 @@ EOF
 ################
 # main program #
 ################
+FECHA=$(date)
+echo "$FECHA natfree-tie $@" >> /var/log/natfree-tie
 main "$@"
 exit 0
 

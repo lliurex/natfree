@@ -1,0 +1,4 @@
+set daemon 30
+check host adi with address _@_WATCH_IP_@_
+	if failed ping then exec "/usr/bin/natfree-tie destroy"
+	if succeeded ping then exec "/usr/bin/natfree-tie put _@_WATCH_IP_@_"
