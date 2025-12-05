@@ -1,0 +1,13 @@
+[Unit]
+Description=Clean natfree
+DefaultDependencies=no
+After=local-fs.target
+Requires=local-fs.target
+Before=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/natfree-tie destroy
+
+[Install]
+WantedBy=multi-user.target

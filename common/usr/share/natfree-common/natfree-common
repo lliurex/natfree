@@ -329,7 +329,9 @@ get_srv_cart_ip(){
 	CART_N="$2" # CONTROLLED_CLASSROOM
 	MAX_CART="$3"
 	# TODO custom ip
-	I=$(( $MAX_CART - $CART_N ))
+	CART_N=$(( $CART_N < 1 ? 1 : $CART_N ))
+	CART_N=$(( $CART_N > $MAX_CART ? $MAX_CART : $CART_N ))
+	I=$(( $MAX_CART - $CART_N + 1 ))
 	get_srv_cidr "$CIDR" "$I" |sed -e "s%/.*$%%" 
 }
 
