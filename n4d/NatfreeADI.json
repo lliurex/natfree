@@ -1,0 +1,17 @@
+{
+	"SETUP":{
+		"type": "python",
+		"path": "NatfreeADI.py",
+		"class": "NatfreeADI"
+	},
+	"METHODS":
+	{
+		"unset":{
+			"allowed_groups": ["admins","admin","sudo","teachers"]
+		},
+		"set":{
+			"allowed_groups": ["admins","admin","sudo","teachers"]
+		}
+
+	}
+}
