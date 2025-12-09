@@ -8,7 +8,7 @@ class NatfreeADI:
     def unset(self):
         p = s.Popen("/usr/bin/natfree-adi unset", shell=True, stdout=s.PIPE, stderr=s.PIPE)
         out, err = p.communicate()
-        if p.returncode != 0:
+        if p.returncode == 0:
             return n4d.responses.build_successful_call_response(True, "ADI unset successfully")
         else:
             return n4d.responses.build_failed_call_response(p.returncode, err.decode().strip())
