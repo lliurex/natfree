@@ -1,0 +1,13 @@
+{
+	"SETUP":{
+		"type": "python",
+		"path": "NatfreeTIE.py",
+		"class": "NatfreeTIE"
+	},
+	"METHODS":
+	{
+		"check_server":{
+			"allowed_groups": [ "*" ]
+		}
+	}
+}

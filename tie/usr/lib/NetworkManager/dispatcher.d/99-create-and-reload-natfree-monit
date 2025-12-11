@@ -6,7 +6,7 @@ ACTION=$2
 
 case "$ACTION" in 
 	up|dhcp4-change|dhcp6-change)
-		natfree-tie UPDATE
+		natfree-tie monit
 		;;
 	*)
 		;;

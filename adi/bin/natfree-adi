@@ -15,6 +15,7 @@ IP_NUMBER="$(get_ip_number)"
 HOSTS_BASE_FILE="natfree-adi"
 SRV_ALIASES="$(get_srv_aliases)"
 
+
 #############
 # functions #
 #############
@@ -94,6 +95,8 @@ EOF
     fi
     [ "$N_CART" ] || usage
     [ -z "$DEBUG" ] || echo "  -- parameters: [ $N_CART ]"
+    CART_N=$(( $CART_N < 1 ? 1 : $CART_N ))
+    CART_N=$(( $CART_N > $IP_NUMBER ? $IP_NUMBER : $CART_N ))
     MASK="${CIDR#*/}"
     CIDR_NUM="$(get_srv_cart_ip "$CIDR" "$N_CART" $IP_NUMBER)"
     [ ! -z "$CIDR_NUM" ] || die "Error on get ip from interface"

@@ -5,7 +5,9 @@ if [ "$2" = "dhcp4-change" ];then
 	VALUE=$(llx-getdhcp-option lliurex_vlan | sed s/\"//g )	
 	if [ ! -z "$VALUE" ];then
 		n4d-vars setvalue LLIUREX_VLAN $VALUE || true
+	else
+		n4d-vars delete LLIUREX_VLAN || true
 	fi
-
+	
 fi
 
