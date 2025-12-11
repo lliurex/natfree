@@ -64,24 +64,18 @@ usage(){
 calculate_values(){
 	# recopile necessary data
 	# get DNS search domain from resolv.conf (if any)
-	echo $CLIENT_MODE	
 	case "$CLIENT_MODE" in
 		a*)
 			# Get values from DHCP
-			echo 1
 			CIDR=$(n4d-vars getvalues LLIUREX_VLAN | cut -d "=" -f 2 | tail -c +2 | head -c -2)
 			# 
-			echo 2 
 			if [ "x$CIDR" = "x" ]; then
 				CIDR="$(get_iface_cidr "$CLIENT_IFACE")"
 			fi
-			echo 3
 			N_CART=$(n4d-vars getvalues CONTROLLED_CLASSROOM | cut -d "=" -f 2 | tail -c +2 | head -c -2)
-			echo 4
 			if [ -z "$N_CART" ]; then
 				N_CART="1"
 			fi
-			echo 5
 			SRV_IP="$(get_srv_cart_ip "$CIDR" "$N_CART" "$IP_NUMBER")"
 			;;
 		i*|d*)
