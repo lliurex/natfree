@@ -1,3 +1,10 @@
+natfree (2.14) noble; urgency=medium
+
+  * Add n4d methods
+  * Add monit to sync services 
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Thu, 11 Dec 2025 10:53:29 +0100
+
 natfree (2.13) noble; urgency=medium
 
   * Manage hosts names when configure with natfree-adi
