@@ -1,3 +1,9 @@
+natfree (2.14.1) noble; urgency=medium
+
+  * Add monit dependency
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Thu, 11 Dec 2025 11:39:02 +0100
+
 natfree (2.14) noble; urgency=medium
 
   * Add n4d methods
