@@ -86,3 +86,18 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, n4d, isc-dhcp-client
 Description: Set into n4d servers vlan get by gva DHCP
  Get 126 option from DHCP, set lliurex_vlan name and store into n4d
+
+Package: n4d-natfree-adi
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, n4d, natfree-adi
+Description: n4d interface to manage natfree-adi
+ Provides n4d methods to manage natfree-adi configuration and
+ virtual interface. 
+
+Package: n4d-natfree-tie
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, n4d
+Description: utils for natfree-tie via n4d 
+ Provides n4d methods to manage natfree-adi configuration and
+ virtual interface. 
+
