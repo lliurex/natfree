@@ -94,6 +94,13 @@ Description: n4d interface to manage natfree-adi
  Provides n4d methods to manage natfree-adi configuration and
  virtual interface. 
 
+Package: n4d-natfree-tie
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, n4d
+Description: utils for natfree-tie via n4d 
+ Provides n4d methods to manage natfree-adi configuration and
+ virtual interface. 
+
 Package: natfree-flex-server
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, n4d (>=0.1963), python3
