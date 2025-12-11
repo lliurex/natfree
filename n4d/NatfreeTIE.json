@@ -7,7 +7,7 @@
 	"METHODS":
 	{
 		"check_server":{
-			"allowed_groups": [ "*" ]
+			"allowed_groups": [ "*", "anonymous" ]
 		}
 	}
 }
