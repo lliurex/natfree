@@ -1,3 +1,9 @@
+natfree (2.11.1) jammy; urgency=medium
+
+  * Add monit dependency
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Thu, 11 Dec 2025 11:38:16 +0100
+
 natfree (2.11) jammy; urgency=medium
 
   * Conflict between adi and tie 

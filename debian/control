@@ -18,7 +18,7 @@ Description: natfree common files
 
 Package: natfree-tie
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), update-hosts
+Depends: ${shlibs:Depends}, ${misc:Depends}, natfree-common (= ${binary:Version}), update-hosts, monit
 Conflicts: natfree-adi
 Description: natfree client tool for portable laptops trolley 
  The configuration included in this package uses default
