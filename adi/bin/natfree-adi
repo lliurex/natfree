@@ -95,8 +95,8 @@ EOF
     fi
     [ "$N_CART" ] || usage
     [ -z "$DEBUG" ] || echo "  -- parameters: [ $N_CART ]"
-    CART_N=$(( $CART_N < 1 ? 1 : $CART_N ))
-    CART_N=$(( $CART_N > $IP_NUMBER ? $IP_NUMBER : $CART_N ))
+    N_CART=$(( $N_CART < 1 ? 1 : $N_CART ))
+    N_CART=$(( $N_CART > $IP_NUMBER ? $IP_NUMBER : $N_CART ))
     MASK="${CIDR#*/}"
     CIDR_NUM="$(get_srv_cart_ip "$CIDR" "$N_CART" $IP_NUMBER)"
     [ ! -z "$CIDR_NUM" ] || die "Error on get ip from interface"
