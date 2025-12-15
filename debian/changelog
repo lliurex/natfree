@@ -1,3 +1,9 @@
+natfree (2.14.1.4) noble; urgency=medium
+
+  * Add absolute path for dhclient
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 15 Dec 2025 18:04:35 +0100
+
 natfree (2.14.1.3) noble; urgency=medium
 
   * anonymous can check if server is available 
