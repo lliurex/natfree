@@ -1,3 +1,9 @@
+natfree (2.15) noble; urgency=medium
+
+  * Add patch for work with new systemd monit config
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Wed, 17 Dec 2025 23:03:08 +0100
+
 natfree (2.14.1.4) noble; urgency=medium
 
   * Add absolute path for dhclient
