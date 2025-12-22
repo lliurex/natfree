@@ -1,3 +1,9 @@
+natfree (2.12) jammy; urgency=medium
+
+  * Dummy upgrade
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 22 Dec 2025 16:46:00 +0100
+
 natfree (2.11) jammy; urgency=medium
 
   * Conflict between adi and tie 
