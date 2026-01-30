@@ -1,3 +1,9 @@
+natfree (2.13) jammy-testing; urgency=medium
+
+  * Migrate to monit
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Fri, 30 Jan 2026 14:49:42 +0100
+
 natfree (2.11.2) jammy; urgency=medium
 
   * Add absolute path for dhclient
