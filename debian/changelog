@@ -1,4 +1,4 @@
-natfree (2.13) jammy-testing; urgency=medium
+natfree (2.13) jammy; urgency=medium
 
   * Migrate to monit
 
