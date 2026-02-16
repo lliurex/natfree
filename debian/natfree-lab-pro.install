@@ -1,1 +1,2 @@
-lab-pro/* /usr/lib/NetworkManager/dispatcher.d/
+lab-pro/dispatcher/* /usr/lib/NetworkManager/dispatcher.d/
+lab-pro/configs/* /etc/
