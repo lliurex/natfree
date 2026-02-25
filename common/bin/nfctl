@@ -97,7 +97,10 @@ EOF
 			case "$B" in
 				NETWORK_CIDR)
 					IP=$(get_iface_cidr $NF_DEF_VIRT_IFACE)
-					get_network_cidr $IP
+					# if IP is not empty run get_network_cidr
+					if [ -n "$IP" ]; then
+						get_network_cidr $IP
+					fi
 					;;
 			esac
 
