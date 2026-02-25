@@ -81,7 +81,27 @@ EOF
 					echo $X
 					;;
 			esac
-		;;
+			;;
+		N*)
+			ACTION="NETWORK"
+			OK=""
+                        for a in $ACTION ; do
+                                if echo "$a" |grep -q "^$A" ; then
+                                       OK="Y"
+                                fi
+                        done
+			[ "$OK" ] || usage
+                        [ -z "$DEBUG" ] || echo "- Action: [ $ACTION ]"
+			shift
+			B="$(echo "$1" |tr "[:lower:]" "[:upper:]")"
+			case "$B" in
+				NETWORK_CIDR)
+					IP=$(get_iface_cidr $NF_DEF_VIRT_IFACE)
+					get_network_cidr $IP
+					;;
+			esac
+
+		
 	esac
 }
 
