@@ -1,3 +1,9 @@
+natfree (2.17) noble; urgency=medium
+
+  * Add SRV_CART action to nfctl
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Wed, 11 Mar 2026 12:44:27 +0100
+
 natfree (2.16.1) noble; urgency=medium
 
   * nfctl no fail if natfree is not enabled
