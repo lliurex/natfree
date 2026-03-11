@@ -18,6 +18,9 @@ usage(){
             "           -d            : debug mode (verbose)" \
             "       COMMAND:" \
             "           GET|VALUE VARIABLE: get value of natfree variable" \
+            "           NETWORK NETWORK_CIDR: get CIDR natfree network" \
+            "           NETWORK SRV_CART [CART_NUMBER]: get server ip from cart, by default 1" \
+	    " " \
             "Command names can be used in lower or upper case and abbreviated down to a single letter." \
             "Where there is ambiguity, dictionary order is used to select a command."
 }
@@ -101,6 +104,22 @@ EOF
 					if [ -n "$IP" ]; then
 						get_network_cidr $IP
 					fi
+					;;
+				SRV_CART)
+					shift
+					CART=$1
+					[ -n "$CART" ] || CART=1
+					IP=$(get_iface_cidr $NF_DEF_VIRT_IFACE)
+					IP_NUMBER="$(get_ip_number)"
+
+					# if IP is not empty run get_network_cidr
+					if [ -n "$IP" ]; then
+						CIRD=$(get_network_cidr $IP)
+						get_srv_cart_ip $CIRD $CART $IP_NUMBER
+					fi
+					;;
+				*)
+					usage
 					;;
 			esac
 
